@@ -99,6 +99,11 @@
     color: #212529;
 }
 
+.notif-item-icon.bg-attention {
+    background: #f07f3c;
+    color: #fff;
+}
+
 .notif-item-icon.bg-danger {
     background: #dc3545;
 }
@@ -151,9 +156,13 @@
     color: #005a3d;
 }
 
-.notif-active .bi-bell,
+.notif-active .bi-bell {
+    color: var(--verde-uniceplac, #00734F) !important;
+    animation: notif-pulse 0.8s infinite;
+}
+
 .sos-active .bi-bell {
-    color: #dc3545 !important;
+    color: #f07f3c !important;
     animation: notif-pulse 0.8s infinite;
 }
 

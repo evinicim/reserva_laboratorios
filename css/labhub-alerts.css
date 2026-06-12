@@ -1,0 +1,207 @@
+/**
+ * LabHub — alertas de atenção (SOS / chamados)
+ * Tom: aviso amigável, não erro crítico.
+ */
+:root {
+    --labhub-attention: #f07f3c;
+    --labhub-attention-soft: rgba(240, 127, 60, 0.12);
+    --labhub-attention-border: rgba(240, 127, 60, 0.45);
+    --labhub-attention-text: #8a4b1a;
+    --labhub-attention-bg: #fff8f0;
+}
+
+.alert-sos-banner {
+    background: var(--labhub-attention-bg);
+    border: 1px solid var(--labhub-attention-border);
+    border-left: 4px solid var(--labhub-attention);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 12px rgba(240, 127, 60, 0.08);
+}
+
+.alert-sos-banner:hover {
+    background: #fff3e6;
+    box-shadow: 0 4px 16px rgba(240, 127, 60, 0.12);
+}
+
+.alert-sos-banner-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    color: var(--labhub-attention-text);
+    font-size: 0.95rem;
+}
+
+.alert-sos-banner-header i {
+    color: var(--labhub-attention);
+    font-size: 1.1rem;
+}
+
+.alert-sos-banner-header small {
+    color: #9a7348;
+    font-weight: 500;
+}
+
+.alert-sos-banner-list {
+    margin: 10px 0 0;
+    padding-left: 1.25rem;
+    color: #5c4a3a;
+    font-size: 0.88rem;
+    line-height: 1.45;
+}
+
+.alert-sos-banner-list li {
+    margin-bottom: 4px;
+}
+
+.alert-sos-banner-list strong {
+    color: var(--labhub-attention-text);
+}
+
+/* Card seção SOS */
+.card-sos-attention {
+    border-top: 4px solid var(--labhub-attention) !important;
+}
+
+.card-sos-attention .card-header h5 {
+    color: var(--labhub-attention-text) !important;
+}
+
+.card-sos-attention .card-header h5 i {
+    color: var(--labhub-attention) !important;
+}
+
+.badge-sos-count {
+    background: var(--labhub-attention) !important;
+    color: #fff !important;
+}
+
+.tr-sos-attention {
+    border-left: 3px solid var(--labhub-attention) !important;
+}
+
+.text-sos-attention {
+    color: var(--labhub-attention) !important;
+}
+
+.apple-btn-attention {
+    background: rgba(240, 127, 60, 0.12);
+    border: 1px solid rgba(240, 127, 60, 0.35);
+    color: #c95b28;
+}
+
+.apple-btn-attention:hover {
+    background: rgba(240, 127, 60, 0.22);
+    color: #a84a1a;
+    transform: translateY(-1px);
+}
+
+.btn-attention {
+    background: var(--labhub-attention);
+    border-color: var(--labhub-attention);
+    color: #fff;
+}
+
+.btn-attention:hover {
+    background: #d96a2e;
+    border-color: #d96a2e;
+    color: #fff;
+}
+
+.modal-sos-attention {
+    border: 3px solid var(--labhub-attention) !important;
+    border-radius: 20px !important;
+}
+
+.modal-header-sos-attention {
+    background: var(--labhub-attention);
+    color: #fff;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+}
+
+[data-bs-theme="dark"] .apple-btn-attention {
+    background: rgba(240, 127, 60, 0.18);
+    border-color: rgba(240, 127, 60, 0.4);
+    color: #ffb088;
+}
+
+[data-bs-theme="dark"] .apple-btn-attention:hover {
+    background: rgba(240, 127, 60, 0.28);
+    color: #ffd4b8;
+}
+
+[data-bs-theme="dark"] {
+    --labhub-attention-soft: rgba(240, 127, 60, 0.18);
+    --labhub-attention-text: #ffd4b8;
+    --labhub-attention-bg: rgba(240, 127, 60, 0.1);
+}
+
+[data-bs-theme="dark"] .alert-sos-banner {
+    background: var(--labhub-attention-bg);
+    border-color: rgba(240, 127, 60, 0.35);
+}
+
+[data-bs-theme="dark"] .alert-sos-banner:hover {
+    background: rgba(240, 127, 60, 0.16);
+}
+
+[data-bs-theme="dark"] .alert-sos-banner-header small {
+    color: #c9a882;
+}
+
+[data-bs-theme="dark"] .alert-sos-banner-list {
+    color: #d4c4b0;
+}
+
+[data-bs-theme="dark"] .card-sos-attention .card-header h5 {
+    color: #ffd4b8 !important;
+}
+
+.sos-problema-cell {
+    min-width: 220px;
+    max-width: 480px;
+    white-space: normal;
+    word-break: break-word;
+    vertical-align: top;
+}
+
+.sos-problema-text {
+    line-height: 1.5;
+}
+
+.sos-problema-text.sos-problema-collapsed {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.sos-problema-toggle {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--labhub-attention);
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.sos-problema-toggle:hover {
+    color: #d96a2e;
+}
+
+[data-bs-theme="dark"] .sos-problema-toggle {
+    color: #ffb088;
+}
+
+[data-bs-theme="dark"] .sos-problema-toggle:hover {
+    color: #ffd4b8;
+}

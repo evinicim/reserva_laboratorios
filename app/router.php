@@ -49,6 +49,7 @@ function getControllerAndAction() {
         'login_google'   => ['AuthController', 'loginGoogle'],
         'logout'         => ['AuthController', 'logout'],
         'verificar'      => ['AuthController', 'verificarEmail'],
+        'redefinir_senha'=> ['AuthController', 'redefinirSenha'],
 
         // Agendamentos
         'Agendamento'          => ['AgendamentoController', 'criar'],
@@ -63,6 +64,7 @@ function getControllerAndAction() {
         'check_sos'        => ['SOSController', 'contarPendentes'],
         'check_sos_status' => ['SOSController', 'listarStatus'],
         'check_notificacoes' => ['NotificacaoController', 'listar'],
+        'api_cadastros'      => ['CadastroApiController', 'handle'],
     ];
 
     return $routes[$page] ?? null;

@@ -10,8 +10,8 @@
                     <form method="POST" action="painel_coordenador.php">
                         <div class="mb-3">
                             <label class="form-label small fw-bold">Professor:</label>
-                            <select name="id_professor" class="form-select" required>
-                                <option value="">Selecione...</option>
+                            <select name="id_professor" class="form-select" required data-lh-combobox>
+                                <option value="">Selecione ou busque...</option>
                                 <?php foreach ($professores as $p): ?>
                                     <option value="<?= $p['id'] ?>"><?= htmlspecialchars($p['nome']) ?></option>
                                 <?php endforeach; ?>
@@ -19,8 +19,8 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label small fw-bold">Disciplina:</label>
-                            <select name="id_disciplina" class="form-select" required>
-                                <option value="">Selecione...</option>
+                            <select name="id_disciplina" class="form-select" required data-lh-combobox data-lh-create="disciplinas">
+                                <option value="">Selecione ou busque...</option>
                                 <?php foreach ($disciplinas as $d): ?>
                                     <option value="<?= $d['id'] ?>"><?= htmlspecialchars($d['nome']) ?></option>
                                 <?php endforeach; ?>
@@ -28,29 +28,54 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label small fw-bold">Curso:</label>
-                            <input type="text" name="curso" class="form-control" required placeholder="Ex: Ciência da Computação">
+                            <select name="curso" class="form-select" required data-lh-combobox data-lh-create="cursos" data-lh-value="nome">
+                                <option value="">Selecione ou busque...</option>
+                                <?php foreach ($cursos_cadastrados as $c): ?>
+                                    <option value="<?= htmlspecialchars($c['nome']) ?>"><?= htmlspecialchars($c['nome']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
                         <div class="row g-2 mb-3">
                             <div class="col-4">
                                 <label class="form-label small fw-bold">Bloco</label>
-                                <input type="text" name="bloco" class="form-control" required placeholder="A">
+                                <select name="bloco" class="form-select" required data-lh-combobox data-lh-create="blocos" data-lh-value="nome">
+                                    <option value="">Selecione...</option>
+                                    <?php foreach ($blocos_cadastrados as $b): ?>
+                                        <option value="<?= htmlspecialchars($b['nome']) ?>"><?= htmlspecialchars($b['nome']) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
                             </div>
                             <div class="col-4">
                                 <label class="form-label small fw-bold">Andar</label>
-                                <input type="text" name="andar" class="form-control" required placeholder="1º">
+                                <select name="andar" class="form-select" required data-lh-combobox data-lh-create="andares" data-lh-value="nome">
+                                    <option value="">Selecione...</option>
+                                    <?php foreach ($andares_cadastrados as $a): ?>
+                                        <option value="<?= htmlspecialchars($a['nome']) ?>"><?= htmlspecialchars($a['nome']) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
                             </div>
                             <div class="col-4">
                                 <label class="form-label small fw-bold">Sala</label>
-                                <input type="text" name="sala" class="form-control" required placeholder="101">
+                                <select name="sala" class="form-select" required data-lh-combobox data-lh-create="salas" data-lh-value="nome">
+                                    <option value="">Selecione...</option>
+                                    <?php foreach ($salas_cadastradas as $s): ?>
+                                        <option value="<?= htmlspecialchars($s['nome']) ?>"><?= htmlspecialchars($s['nome']) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
                             </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label small fw-bold">Categoria:</label>
-                            <input type="text" name="categoria" class="form-control" placeholder="Presencial / EAD Polo">
+                            <select name="categoria" class="form-select" data-lh-combobox>
+                                <option value="">Selecione...</option>
+                                <?php foreach (['Presencial', 'EAD Polo', 'Híbrido', 'Presencial / EAD Polo'] as $cat): ?>
+                                    <option value="<?= htmlspecialchars($cat) ?>"><?= htmlspecialchars($cat) ?></option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
                         <div class="mb-3">
                             <label class="form-label small fw-bold">Turno:</label>
-                            <select name="turno" class="form-select" required>
+                            <select name="turno" class="form-select" required data-lh-combobox>
                                 <option value="">Selecione...</option>
                                 <option value="Matutino">Matutino</option>
                                 <option value="Vespertino">Vespertino</option>
@@ -138,7 +163,7 @@
                                 <input type="hidden" name="id_ensalamento" value="<?= $en['id'] ?>">
                                 <div class="mb-2">
                                     <label class="form-label small fw-bold">Professor</label>
-                                    <select name="id_professor" class="form-select" required>
+                                    <select name="id_professor" class="form-select" required data-lh-combobox>
                                         <?php foreach ($professores as $p): ?>
                                             <option value="<?= $p['id'] ?>" <?= $p['id'] == $en['id_professor'] ? 'selected' : '' ?>><?= htmlspecialchars($p['nome']) ?></option>
                                         <?php endforeach; ?>
@@ -146,7 +171,7 @@
                                 </div>
                                 <div class="mb-2">
                                     <label class="form-label small fw-bold">Disciplina</label>
-                                    <select name="id_disciplina" class="form-select" required>
+                                    <select name="id_disciplina" class="form-select" required data-lh-combobox data-lh-create="disciplinas">
                                         <?php foreach ($disciplinas as $d): ?>
                                             <option value="<?= $d['id'] ?>" <?= $d['id'] == $en['id_disciplina'] ? 'selected' : '' ?>><?= htmlspecialchars($d['nome']) ?></option>
                                         <?php endforeach; ?>
@@ -154,18 +179,56 @@
                                 </div>
                                 <div class="mb-2">
                                     <label class="form-label small fw-bold">Curso</label>
-                                    <input type="text" name="curso" class="form-control" value="<?= htmlspecialchars($en['curso']) ?>" required>
+                                    <select name="curso" class="form-select" required data-lh-combobox data-lh-create="cursos" data-lh-value="nome">
+                                        <option value="">Selecione ou busque...</option>
+                                        <?php foreach ($cursos_cadastrados as $c): ?>
+                                            <option value="<?= htmlspecialchars($c['nome']) ?>" <?= ($en['curso'] ?? '') === $c['nome'] ? 'selected' : '' ?>><?= htmlspecialchars($c['nome']) ?></option>
+                                        <?php endforeach; ?>
+                                        <?php if (!empty($en['curso']) && !in_array($en['curso'], array_column($cursos_cadastrados, 'nome'), true)): ?>
+                                            <option value="<?= htmlspecialchars($en['curso']) ?>" selected><?= htmlspecialchars($en['curso']) ?></option>
+                                        <?php endif; ?>
+                                    </select>
                                 </div>
                                 <div class="row g-2 mb-2">
-                                    <div class="col-4"><input type="text" name="bloco" class="form-control" value="<?= htmlspecialchars($en['bloco']) ?>" required placeholder="Bloco"></div>
-                                    <div class="col-4"><input type="text" name="andar" class="form-control" value="<?= htmlspecialchars($en['andar']) ?>" required placeholder="Andar"></div>
-                                    <div class="col-4"><input type="text" name="sala" class="form-control" value="<?= htmlspecialchars($en['sala']) ?>" required placeholder="Sala"></div>
+                                    <div class="col-4">
+                                        <label class="form-label small fw-bold">Bloco</label>
+                                        <select name="bloco" class="form-select" required data-lh-combobox data-lh-create="blocos" data-lh-value="nome">
+                                            <option value="">Selecione...</option>
+                                            <?php foreach ($blocos_cadastrados as $b): ?>
+                                                <option value="<?= htmlspecialchars($b['nome']) ?>" <?= ($en['bloco'] ?? '') === $b['nome'] ? 'selected' : '' ?>><?= htmlspecialchars($b['nome']) ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                    <div class="col-4">
+                                        <label class="form-label small fw-bold">Andar</label>
+                                        <select name="andar" class="form-select" required data-lh-combobox data-lh-create="andares" data-lh-value="nome">
+                                            <option value="">Selecione...</option>
+                                            <?php foreach ($andares_cadastrados as $a): ?>
+                                                <option value="<?= htmlspecialchars($a['nome']) ?>" <?= ($en['andar'] ?? '') === $a['nome'] ? 'selected' : '' ?>><?= htmlspecialchars($a['nome']) ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                    <div class="col-4">
+                                        <label class="form-label small fw-bold">Sala</label>
+                                        <select name="sala" class="form-select" required data-lh-combobox data-lh-create="salas" data-lh-value="nome">
+                                            <option value="">Selecione...</option>
+                                            <?php foreach ($salas_cadastradas as $s): ?>
+                                                <option value="<?= htmlspecialchars($s['nome']) ?>" <?= ($en['sala'] ?? '') === $s['nome'] ? 'selected' : '' ?>><?= htmlspecialchars($s['nome']) ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
                                 </div>
                                 <div class="mb-2">
-                                    <input type="text" name="categoria" class="form-control" value="<?= htmlspecialchars($en['categoria'] ?? '') ?>" placeholder="Categoria">
+                                    <label class="form-label small fw-bold">Categoria</label>
+                                    <select name="categoria" class="form-select" data-lh-combobox>
+                                        <option value="">Selecione...</option>
+                                        <?php foreach (['Presencial', 'EAD Polo', 'Híbrido', 'Presencial / EAD Polo'] as $cat): ?>
+                                            <option value="<?= htmlspecialchars($cat) ?>" <?= ($en['categoria'] ?? '') === $cat ? 'selected' : '' ?>><?= htmlspecialchars($cat) ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
                                 </div>
                                 <div class="mb-3">
-                                    <select name="turno" class="form-select" required>
+                                    <select name="turno" class="form-select" required data-lh-combobox>
                                         <?php foreach (['Matutino', 'Vespertino', 'Noturno'] as $t): ?>
                                             <option value="<?= $t ?>" <?= $en['turno'] === $t ? 'selected' : '' ?>><?= $t ?></option>
                                         <?php endforeach; ?>

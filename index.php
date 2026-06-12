@@ -32,6 +32,16 @@ if (is_array($controller_data)) {
         body {
             background-color: #f0f2f5;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 1.5rem;
+            box-sizing: border-box;
+        }
+
+        .login-shell {
+            width: min(100%, 28rem);
         }
 
         .text-uniceplac { color: var(--azul-uniceplac) !important; }
@@ -97,10 +107,9 @@ if (is_array($controller_data)) {
     </style>
 </head>
 
-<body class="d-flex justify-content-center align-items-center vh-100">
-    <div class="container d-flex justify-content-center">
-
-        <div class="card card-uniceplac shadow-lg" style="width: 28rem;">
+<body>
+    <main class="login-shell">
+        <div class="card card-uniceplac shadow-lg w-100">
             <div class="card-body p-4 p-md-5">
 
                 <div class="text-center mb-4">
@@ -151,8 +160,7 @@ if (is_array($controller_data)) {
                 </form>
             </div>
         </div>
-
-    </div>
+    </main>
     <script>
         document.querySelector('form[action="index.php"]')?.addEventListener('submit', function () {
             const btn = document.getElementById('btnAcessar');

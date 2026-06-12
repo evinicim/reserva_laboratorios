@@ -23,3 +23,17 @@ services:
         sync: false
       - key: APP_ENV
         value: production
+      - key: APP_URL
+        value: https://labhub-uniceplac.onrender.com
+      - key: MAIL_HOST
+        value: smtp-relay.brevo.com
+      - key: MAIL_PORT
+        value: "587"
+      - key: MAIL_USERNAME
+        value: ae8949001@smtp-brevo.com
+      - key: MAIL_PASSWORD
+        sync: false
+      - key: MAIL_FROM_ADDRESS
+        value: admin@uniceplac.edu.br
+      - key: MAIL_FROM_NAME
+        value: LabHub UNICEPLAC

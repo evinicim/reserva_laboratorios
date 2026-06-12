@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['acao_sos'])) {
     try {
         $stmt = $pdo->prepare("INSERT INTO chamados_suporte (id_professor, professor_nome, laboratorio, mensagem) VALUES (?, ?, ?, ?)");
         $stmt->execute([$id_professor_logado, $_SESSION['nome'], $_POST['laboratorio_sos'], trim($_POST['mensagem_sos'])]);
-        $mensagem = '<div class="alert alert-success alert-autohide rounded-0 border-0 border-start border-4 border-success shadow-sm mb-4"><i class="bi bi-check-circle-fill me-2"></i><strong>SOS Enviado!</strong> O suporte técnico foi notificado.</div>';
+        $mensagem = '<div class="alert alert-success alert-autohide rounded-0 border-0 border-start border-4 border-success shadow-sm mb-4"><i class="bi bi-check-circle-fill me-2"></i><strong>Chamado enviado!</strong> O suporte técnico foi notificado.</div>';
     } catch (PDOException $e) { $mensagem = '<div class="alert alert-danger alert-autohide mb-4">Erro ao chamar suporte.</div>'; }
 }
 
@@ -361,7 +361,7 @@ function renderizarCardAulaProfessor($aula, $hoje, $chaves_retiradas, $borda_cla
                     <hr class="my-3 opacity-25">
                     <?php if ($ja_retirou): ?>
                         <div class="apple-tag mb-2"><div class="apple-dot"></div> EM USO (Sua Aula)</div>
-                        <button type="button" class="apple-btn apple-btn-danger heartbeat" data-bs-toggle="modal" data-bs-target="#modalSOS<?= $aula['id'] ?>"><i class="bi bi-exclamation-triangle-fill me-2"></i> Chamado SOS</button>
+                        <button type="button" class="apple-btn apple-btn-attention" data-bs-toggle="modal" data-bs-target="#modalSOS<?= $aula['id'] ?>"><i class="bi bi-headset me-2"></i> Pedir ajuda ao suporte</button>
                     <?php else: ?>
                         <button type="button" class="apple-btn apple-btn-success mb-2" data-bs-toggle="modal" data-bs-target="#modalChave<?= $aula['id'] ?>"><i class="bi bi-key-fill me-2"></i> Retirar Chave</button>
                     <?php endif; ?>
@@ -394,14 +394,14 @@ function renderizarCardAulaProfessor($aula, $hoje, $chaves_retiradas, $borda_cla
 
     <?php if ($aula['data_reserva'] == $hoje && $ja_retirou): ?>
         <div class="modal fade" id="modalSOS<?= $aula['id'] ?>" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered"><div class="modal-content border-danger" style="border-width: 3px; border-radius: 20px !important;">
-                <div class="modal-header bg-danger text-white border-0" style="border-top-left-radius: 16px; border-top-right-radius: 16px;"><h5 class="modal-title fw-bold"><i class="bi bi-headset me-2"></i> Chamado SOS</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+            <div class="modal-dialog modal-dialog-centered"><div class="modal-content modal-sos-attention">
+                <div class="modal-header modal-header-sos-attention border-0"><h5 class="modal-title fw-bold"><i class="bi bi-headset me-2"></i> Pedir ajuda ao suporte</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
                 <div class="modal-body text-start p-4">
                     <form method="POST" action="painel_professor.php">
                         <input type="hidden" name="acao_sos" value="1"><input type="hidden" name="laboratorio_sos" value="<?= htmlspecialchars($aula['laboratorio']) ?>">
                         <p class="text-secondary small mb-3">Lab: <strong class="text-dark"><?= htmlspecialchars($aula['laboratorio']) ?></strong></p>
-                        <div class="mb-4"><label class="form-label fw-bold">Problema:</label><textarea class="form-control" style="border-radius: 15px;" name="mensagem_sos" rows="4" placeholder="O PC não liga..." required></textarea></div>
-                        <button type="submit" class="btn btn-danger w-100 fw-bold py-2 rounded-pill"><i class="bi bi-send me-1"></i> Enviar Alerta</button>
+                        <div class="mb-4"><label class="form-label fw-bold">Descreva o problema:</label><textarea class="form-control" style="border-radius: 15px;" name="mensagem_sos" rows="4" placeholder="Ex.: projetor não liga, ar-condicionado com vazamento..." required></textarea></div>
+                        <button type="submit" class="btn btn-attention w-100 fw-bold py-2 rounded-pill"><i class="bi bi-send me-1"></i> Enviar chamado</button>
                     </form>
                 </div>
             </div></div>
@@ -436,6 +436,7 @@ function renderizarCardEnsalamento($e, $badge_cor, $borda_classe) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="css/notificacoes-nav.css">
+    <link rel="stylesheet" href="css/labhub-alerts.css">
     
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.11/locales-all.global.min.js"></script>
@@ -766,8 +767,8 @@ function renderizarCardEnsalamento($e, $badge_cor, $borda_classe) {
                                     <div class="col-md-4"><label class="form-label fw-bold text-secondary">Horário:</label><select class="form-select form-select-lg" name="periodo" required><option>1º e 2º Horários</option><option>1º Horário</option><option>2º Horário</option></select></div>
                                 </div>
                                 <div class="row mb-5">
-                                    <div class="col-md-6 mb-3 mb-md-0"><label class="form-label fw-bold text-secondary">Laboratório:</label><select class="form-select form-select-lg" name="id_laboratorio" required><option value="">Selecione...</option><?php foreach($laboratorios as $lab): ?><option value="<?= $lab['id'] ?>"><?= htmlspecialchars($lab['nome']) ?> (Cap: <?= $lab['capacidade'] ?>)</option><?php endforeach; ?></select></div>
-                                    <div class="col-md-6"><label class="form-label fw-bold text-secondary">Disciplina:</label><select class="form-select form-select-lg" name="id_disciplina" required><option value="">Selecione...</option><?php foreach($disciplinas as $disc): ?><option value="<?= $disc['id'] ?>"><?= htmlspecialchars($disc['nome']) ?></option><?php endforeach; ?></select></div>
+                                    <div class="col-md-6 mb-3 mb-md-0"><label class="form-label fw-bold text-secondary">Laboratório:</label><select class="form-select form-select-lg" name="id_laboratorio" required data-lh-combobox><option value="">Busque o laboratório...</option><?php foreach($laboratorios as $lab): ?><option value="<?= $lab['id'] ?>"><?= htmlspecialchars($lab['nome']) ?> (Cap: <?= $lab['capacidade'] ?>)</option><?php endforeach; ?></select></div>
+                                    <div class="col-md-6"><label class="form-label fw-bold text-secondary">Disciplina:</label><select class="form-select form-select-lg" name="id_disciplina" required data-lh-combobox><option value="">Busque a disciplina...</option><?php foreach($disciplinas as $disc): ?><option value="<?= $disc['id'] ?>"><?= htmlspecialchars($disc['nome']) ?></option><?php endforeach; ?></select></div>
                                 </div>
                                 <div class="d-flex justify-content-end"><button type="submit" class="btn btn-uniceplac btn-lg px-5 w-100 w-md-auto rounded-pill"><i class="bi bi-send-check me-2"></i>Enviar Solicitação</button></div>
                             </form>
@@ -1007,5 +1008,13 @@ function renderizarCardEnsalamento($e, $badge_cor, $borda_classe) {
 
         });
     </script>
+    <?php
+    $labhub_catalog = [
+        'disciplinas'  => array_map(static fn($d) => ['id' => $d['id'], 'nome' => $d['nome']], $disciplinas ?? []),
+        'laboratorios' => array_map(static fn($l) => ['id' => $l['id'], 'nome' => $l['nome'] . ' (Cap: ' . ($l['capacidade'] ?? 0) . ')'], $laboratorios ?? []),
+    ];
+    $labhub_can_create = false;
+    require __DIR__ . '/app/Views/partials/labhub-combobox-setup.php';
+    ?>
 </body>
 </html>

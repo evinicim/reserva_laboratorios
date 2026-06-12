@@ -36,8 +36,11 @@ class AgendamentoController extends BaseController {
 
         $laboratorios = $this->agendamentoModel->buscarLaboratorios();
         $disciplinas = $this->agendamentoModel->buscarDisciplinas();
+        $pdo = \App\Config\Database::getInstance()->getPDO();
+        $professores = $pdo->query("SELECT id, nome FROM usuarios WHERE perfil = 'professor' ORDER BY nome ASC")->fetchAll(\PDO::FETCH_ASSOC);
+        $reserva_atual = $agendamento;
 
-        return compact('agendamento', 'laboratorios', 'disciplinas');
+        return compact('reserva_atual', 'laboratorios', 'disciplinas', 'professores');
     }
 
     /**

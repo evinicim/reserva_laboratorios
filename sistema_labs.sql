@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
   `perfil`             ENUM('coordenador','professor','suporte') NOT NULL DEFAULT 'professor',
   `email_verificado`   TINYINT(1)       NOT NULL DEFAULT 0,
   `token_verificacao`  VARCHAR(255)     NULL      DEFAULT NULL,
+  `token_expira_em`    DATETIME         NULL      DEFAULT NULL COMMENT 'Expiração do token (redefinição de senha)',
   `google_id`          VARCHAR(100)     NULL      DEFAULT NULL,
   `foto_perfil`        VARCHAR(500)     NULL      DEFAULT NULL COMMENT 'Caminho local (uploads/) ou URL do avatar Google',
   PRIMARY KEY (`id`),

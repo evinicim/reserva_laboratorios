@@ -56,10 +56,10 @@ $mensagem = $mensagem ?? '';
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label fw-bold">Turno:</label>
-                                    <select class="form-select" name="turno" required>
-                                        <option value="Manhã" <?= $reserva_atual['turno'] == 'Manhã' ? 'selected' : '' ?>>Manhã</option>
-                                        <option value="Tarde" <?= $reserva_atual['turno'] == 'Tarde' ? 'selected' : '' ?>>Tarde</option>
-                                        <option value="Noite" <?= $reserva_atual['turno'] == 'Noite' ? 'selected' : '' ?>>Noite</option>
+                                    <select class="form-select" name="turno" required data-lh-combobox>
+                                        <option value="Matutino" <?= $reserva_atual['turno'] == 'Matutino' ? 'selected' : '' ?>>Matutino</option>
+                                        <option value="Vespertino" <?= $reserva_atual['turno'] == 'Vespertino' ? 'selected' : '' ?>>Vespertino</option>
+                                        <option value="Noturno" <?= $reserva_atual['turno'] == 'Noturno' ? 'selected' : '' ?>>Noturno</option>
                                     </select>
                                 </div>
                                 <div class="col-md-4">
@@ -73,7 +73,7 @@ $mensagem = $mensagem ?? '';
                             </div>
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Laboratório:</label>
-                                <select class="form-select" name="id_laboratorio" required>
+                                <select class="form-select" name="id_laboratorio" required data-lh-combobox data-lh-create="laboratorios">
                                     <?php foreach($laboratorios as $lab): ?>
                                         <option value="<?= $lab['id'] ?>" <?= $reserva_atual['id_laboratorio'] == $lab['id'] ? 'selected' : '' ?>>
                                             <?= htmlspecialchars($lab['nome']) ?>
@@ -84,7 +84,7 @@ $mensagem = $mensagem ?? '';
                             <div class="row mb-4">
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Professor:</label>
-                                    <select class="form-select" name="id_professor" required>
+                                    <select class="form-select" name="id_professor" required data-lh-combobox>
                                         <?php foreach($professores as $prof): ?>
                                             <option value="<?= $prof['id'] ?>" <?= $reserva_atual['id_professor'] == $prof['id'] ? 'selected' : '' ?>>
                                                 <?= htmlspecialchars($prof['nome']) ?>
@@ -94,7 +94,7 @@ $mensagem = $mensagem ?? '';
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Disciplina:</label>
-                                    <select class="form-select" name="id_disciplina" required>
+                                    <select class="form-select" name="id_disciplina" required data-lh-combobox data-lh-create="disciplinas">
                                         <?php foreach($disciplinas as $disc): ?>
                                             <option value="<?= $disc['id'] ?>" <?= $reserva_atual['id_disciplina'] == $disc['id'] ? 'selected' : '' ?>>
                                                 <?= htmlspecialchars($disc['nome']) ?>
@@ -110,5 +110,14 @@ $mensagem = $mensagem ?? '';
             </div>
         </div>
     </div>
+    <?php
+    $labhub_catalog = [
+        'disciplinas'  => array_map(static fn($d) => ['id' => $d['id'], 'nome' => $d['nome']], $disciplinas ?? []),
+        'laboratorios' => array_map(static fn($l) => ['id' => $l['id'], 'nome' => $l['nome']], $laboratorios ?? []),
+        'professores'  => array_map(static fn($p) => ['id' => $p['id'], 'nome' => $p['nome']], $professores ?? []),
+    ];
+    $labhub_can_create = (($_SESSION['perfil'] ?? '') === 'coordenador');
+    require __DIR__ . '/app/Views/partials/labhub-combobox-setup.php';
+    ?>
 </body>
 </html>

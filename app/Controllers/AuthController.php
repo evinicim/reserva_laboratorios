@@ -310,14 +310,11 @@ class AuthController extends BaseController {
             $token = trim($_GET['token']);
 
             try {
-                $usuario = $this->userModel->findByToken($token);
+                $usuarioSvc = new \App\Services\UsuarioService();
+                $usuario    = $usuarioSvc->buscarPorTokenVerificacao($token);
 
                 if ($usuario) {
-                    $this->userModel->update($usuario['id'], [
-                        'email_verificado'  => 1,
-                        'token_verificacao' => null,
-                    ]);
-
+                    $usuarioSvc->confirmarEmail((int) $usuario['id']);
                     $mensagem    = "Excelente, " . htmlspecialchars($usuario['nome']) . "! Seu e-mail foi verificado com sucesso.";
                     $tipo_alerta = "success";
                 } else {
@@ -334,6 +331,42 @@ class AuthController extends BaseController {
         }
 
         return compact('mensagem', 'tipo_alerta');
+    }
+
+    /**
+     * Redefinição de senha via link enviado por e-mail
+     */
+    public function redefinirSenha() {
+        $usuarioSvc = new \App\Services\UsuarioService();
+        $token      = trim($this->request->query('token', ''));
+        $erro       = '';
+        $sucesso    = '';
+        $tokenValido = false;
+        $usuario    = null;
+
+        if ($token !== '') {
+            $usuario = $usuarioSvc->buscarPorTokenRedefinicao($token);
+            $tokenValido = (bool) $usuario;
+        }
+
+        if ($this->request->isMethod('post')) {
+            $tokenPost = trim($this->request->input('token', ''));
+            $senha     = $this->request->input('senha', '');
+            $confirma  = $this->request->input('confirmar_senha', '');
+
+            if ($senha !== $confirma) {
+                $erro = 'As senhas não coincidem.';
+            } elseif (strlen($senha) < 6) {
+                $erro = 'A senha deve ter pelo menos 6 caracteres.';
+            } elseif (!$usuarioSvc->redefinirSenhaPorToken($tokenPost, $senha)) {
+                $erro = 'Link inválido ou expirado. Solicite um novo link à coordenação.';
+            } else {
+                $sucesso = 'Senha alterada com sucesso! Você já pode fazer login.';
+                $tokenValido = false;
+            }
+        }
+
+        return compact('token', 'erro', 'sucesso', 'tokenValido', 'usuario');
     }
 }
 ?>

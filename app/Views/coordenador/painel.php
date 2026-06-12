@@ -265,6 +265,20 @@
             position: relative;
         }
 
+        .card-grade-aula {
+            cursor: grab;
+        }
+
+        .card-grade-aula:active {
+            cursor: grabbing;
+        }
+
+        .grade-slot-livre {
+            cursor: default;
+            user-select: none;
+            pointer-events: none;
+        }
+
         .aula-card-google.matutino {
             background: rgba(0, 115, 79, 0.12);
             border-left-color: var(--manha-cor);
@@ -748,7 +762,8 @@
                 <div class="me-3 top-icon-btn" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"><i
                         class="bi bi-grid-3x3-gap fs-5"></i></div>
                 <img src="<?= htmlspecialchars($foto_atual) ?>" alt="Foto" class="avatar-img-small ms-1"
-                    id="btnAlterarFotoNav">
+                    id="btnAlterarFotoNav" title="Meu perfil" style="cursor:pointer;"
+                    onclick="showSection('sessao-perfil')">
             </div>
         </div>
     </nav>
@@ -795,6 +810,10 @@
                     Ensalamento</a>
                 <a href="javascript:void(0);" onclick="showSection('sessao-usuarios')" data-bs-dismiss="offcanvas"
                     class="offcanvas-menu-link"><i class="bi bi-people-fill text-secondary me-2"></i> Usuários do Sistema</a>
+
+                <div class="p-3 text-muted small fw-bold text-uppercase opacity-50 border-top mt-2">Conta</div>
+                <a href="javascript:void(0);" onclick="showSection('sessao-perfil')" data-bs-dismiss="offcanvas"
+                    class="offcanvas-menu-link"><i class="bi bi-person-circle text-secondary me-2"></i> Meu Perfil</a>
 
                 <div class="p-3 text-muted small fw-bold text-uppercase opacity-50 border-top mt-2">Cadastros Base</div>
                 <a href="javascript:void(0);" onclick="showSection('sessao-cursos')" data-bs-dismiss="offcanvas"
@@ -860,49 +879,10 @@
 
     <?php require __DIR__ . '/abas/sessao-ensalamento.php'; ?>
 
-    <!-- Seção: Gestão de Usuários -->
-    <div id="sessao-usuarios" class="content-section container-fluid px-4 pb-5">
-        <div class="card shadow-sm border-0 mb-4" style="border-top: 4px solid var(--roxo-uniceplac);">
-            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 fw-bold" style="color:var(--roxo-uniceplac);"><i class="bi bi-people-fill me-3 fs-4"></i>Usuários do Sistema</h5>
-                <span class="badge" style="background:var(--roxo-uniceplac);"><?= count($lista_usuarios) ?> cadastrados</span>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive" style="max-height:600px;overflow-y:auto;">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light sticky-top">
-                            <tr>
-                                <th class="ps-4 py-3">Nome</th>
-                                <th>E-mail</th>
-                                <th>Perfil</th>
-                                <th class="pe-4">E-mail Verificado</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($lista_usuarios as $u): ?>
-                            <tr>
-                                <td class="ps-4 fw-bold text-dark"><?= htmlspecialchars($u['nome']) ?></td>
-                                <td class="text-muted small"><?= htmlspecialchars($u['email']) ?></td>
-                                <td>
-                                    <?php if ($u['perfil'] === 'coordenador'): ?>
-                                        <span class="badge" style="background:var(--verde-uniceplac);">Coordenador</span>
-                                    <?php elseif ($u['perfil'] === 'professor'): ?>
-                                        <span class="badge" style="background:var(--roxo-uniceplac);">Professor</span>
-                                    <?php else: ?>
-                                        <span class="badge bg-info text-dark">Suporte TI</span>
-                                    <?php endif; ?>
-                                </td>
-                                <td class="pe-4">
-                                    <?= $u['email_verificado'] ? '<span class="badge bg-success rounded-pill"><i class="bi bi-check-circle me-1"></i>Verificado</span>' : '<span class="badge bg-warning text-dark rounded-pill"><i class="bi bi-hourglass-split me-1"></i>Pendente</span>' ?>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
+    <?php require __DIR__ . '/../partials/sessao-perfil.php'; ?>
+
+    <?php require __DIR__ . '/abas/sessao-usuarios.php'; ?>
+
     <div class="modal fade" id="modalDetalheEvento" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow" style="border-radius: 16px;">
@@ -1035,6 +1015,9 @@
 
             caixa.style.display = abrir ? 'block' : 'none';
             if (seta) seta.style.transform = abrir ? 'rotate(180deg)' : 'rotate(0deg)';
+            if (abrir && typeof initLabhubComboboxes === 'function') {
+                initLabhubComboboxes(caixa);
+            }
             if (btn && caixaId === 'dropMenuTI') {
                 btn.setAttribute('aria-expanded', abrir ? 'true' : 'false');
             }
@@ -1073,25 +1056,52 @@
             // MOTOR DO DRAG AND DROP (KANBAN)
             const colunasGrade = document.querySelectorAll('.coluna-sortable');
 
+            function colunaTemAulas(coluna) {
+                return coluna.querySelectorAll('.card-grade-aula').length > 0;
+            }
+
+            function removerPlaceholderLivre(coluna) {
+                coluna.querySelectorAll('.grade-slot-livre').forEach(function (el) { el.remove(); });
+            }
+
+            function garantirPlaceholderLivre(coluna) {
+                if (!colunaTemAulas(coluna) && !coluna.querySelector('.grade-slot-livre')) {
+                    coluna.insertAdjacentHTML('beforeend',
+                        '<div class="grade-slot-livre text-center mt-4 text-muted small opacity-50 fw-bold">' +
+                        '<i class="bi bi-cup-hot fs-4 d-block mb-1"></i>Livre</div>');
+                }
+            }
+
             colunasGrade.forEach(coluna => {
                 new Sortable(coluna, {
-                    group: 'gradeUniceplac', // Permite arrastar entre colunas diferentes
-                    animation: 150, // Suavidade da animação (ms)
-                    ghostClass: 'opacity-50', // Efeito visual no card original enquanto arrasta
+                    group: 'gradeUniceplac',
+                    animation: 150,
+                    ghostClass: 'opacity-50',
+                    draggable: '.card-grade-aula',
+                    filter: '.grade-slot-livre',
+                    preventOnFilter: true,
 
                     onEnd: function (evt) {
                         const cardArrastado = evt.item;
                         const colunaDestino = evt.to;
                         const colunaOrigem = evt.from;
 
-                        // Se soltou no mesmo lugar, não faz nada
+                        if (!cardArrastado.classList.contains('card-grade-aula')) {
+                            return;
+                        }
+
                         if (colunaOrigem === colunaDestino) return;
 
-                        // Pega os dados invisíveis que colocamos no HTML
                         const idAula = cardArrastado.getAttribute('data-id-aula');
                         const novoDia = colunaDestino.getAttribute('data-dia');
 
-                        // Envia o comando silencioso pro PHP (Ajax)
+                        if (!idAula || !novoDia) {
+                            colunaOrigem.appendChild(cardArrastado);
+                            return;
+                        }
+
+                        removerPlaceholderLivre(colunaDestino);
+
                         let formData = new FormData();
                         formData.append('action', 'mover_aula');
                         formData.append('id_aula', idAula);
@@ -1105,14 +1115,19 @@
                             .then(data => {
                                 if (!data.success) {
                                     alert("Opa! Houve um erro no banco de dados ao salvar a posição.");
-                                    // Se der erro, joga o card de volta pra onde estava
-                                    evt.from.appendChild(evt.item);
+                                    colunaOrigem.appendChild(cardArrastado);
+                                    removerPlaceholderLivre(colunaOrigem);
+                                    garantirPlaceholderLivre(colunaDestino);
+                                } else {
+                                    garantirPlaceholderLivre(colunaOrigem);
                                 }
                             })
                             .catch(error => {
                                 console.error('Erro de conexão:', error);
                                 alert("Falha de conexão. A aula voltou para a posição original.");
-                                evt.from.appendChild(evt.item);
+                                colunaOrigem.appendChild(cardArrastado);
+                                removerPlaceholderLivre(colunaOrigem);
+                                garantirPlaceholderLivre(colunaDestino);
                             });
                     }
                 });
@@ -1276,11 +1291,11 @@
                 setTimeout(() => { alerta.style.transition = "opacity 0.6s ease"; alerta.style.opacity = "0"; setTimeout(() => alerta.remove(), 600); }, 4000);
             });
 
-            const btnFoto = document.getElementById('btnAlterarFotoNav');
             const inputFoto = document.getElementById('nova_foto_input');
-            if (btnFoto && inputFoto) {
-                btnFoto.addEventListener('click', () => inputFoto.click());
-                inputFoto.addEventListener('change', function () { if (this.value) document.getElementById('formFotoPerfil').submit(); });
+            if (inputFoto) {
+                inputFoto.addEventListener('change', function () {
+                    if (this.value) document.getElementById('formFotoPerfil').submit();
+                });
             }
 
             const urlAba = new URLSearchParams(window.location.search).get('aba') || '';
@@ -1501,6 +1516,21 @@
             document.body.removeChild(link);
         }
     </script>
+    <?php
+    $labhub_catalog = [
+        'disciplinas'  => array_map(static fn($d) => ['id' => $d['id'], 'nome' => $d['nome']], $disciplinas ?? []),
+        'cursos'       => array_map(static fn($c) => ['id' => $c['id'], 'nome' => $c['nome']], $cursos_cadastrados ?? []),
+        'semestres'    => array_map(static fn($s) => ['id' => $s['id'], 'nome' => $s['nome']], $semestres_cadastrados ?? []),
+        'blocos'       => array_map(static fn($b) => ['id' => $b['id'], 'nome' => $b['nome']], $blocos_cadastrados ?? []),
+        'andares'      => array_map(static fn($a) => ['id' => $a['id'], 'nome' => $a['nome']], $andares_cadastrados ?? []),
+        'salas'        => array_map(static fn($s) => ['id' => $s['id'], 'nome' => $s['nome']], $salas_cadastradas ?? []),
+        'laboratorios' => array_map(static fn($l) => ['id' => $l['id'], 'nome' => $l['nome'] . ' (Cap: ' . ($l['capacidade'] ?? 0) . ')', 'label' => $l['nome'] . ' (Cap: ' . ($l['capacidade'] ?? 0) . ')'], $laboratorios_cadastrados ?? []),
+        'professores'  => array_map(static fn($p) => ['id' => $p['id'], 'nome' => $p['nome']], $professores ?? []),
+        'categorias'   => ['Presencial', 'EAD Polo', 'Híbrido', 'Presencial / EAD Polo'],
+    ];
+    $labhub_can_create = true;
+    require __DIR__ . '/../partials/labhub-combobox-setup.php';
+    ?>
 </body>
 
 </html>

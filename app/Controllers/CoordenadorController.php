@@ -3,6 +3,8 @@ namespace App\Controllers;
 
 use App\Models\Agendamento as AgendamentoModel;
 use App\Models\User;
+use App\Services\MailService;
+use App\Services\UsuarioService;
 use PDO;
 use PDOException;
 
@@ -113,8 +115,91 @@ if (isset($_FILES['nova_foto']) && $_FILES['nova_foto']['error'] === UPLOAD_ERR_
             }
             $pdo->prepare("UPDATE usuarios SET foto_perfil = ? WHERE id = ?")->execute([$destino, $id_usuario_logado]);
             $_SESSION['foto_perfil'] = $destino;
-            $mensagem = '<div class="alert alert-success alert-autohide rounded-0 border-start border-4 border-success mb-4">Foto atualizada!</div>';
+            $_SESSION['coordenador_flash'] = '<div class="alert alert-success alert-autohide rounded-0 border-start border-4 border-success mb-4"><i class="bi bi-check-circle me-2"></i>Foto atualizada com sucesso!</div>';
+            $_SESSION['coordenador_aba'] = 'sessao-perfil';
+            header('Location: painel_coordenador.php?aba=sessao-perfil');
+            exit;
         }
+    }
+}
+
+// --- GESTÃO DE USUÁRIOS (ADMIN) ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $usuarioSvc = new UsuarioService();
+    $mailSvc    = new MailService();
+    $flashUsuarios = null;
+
+    try {
+        if (isset($_POST['admin_editar_usuario'])) {
+            $id = (int) ($_POST['id_usuario'] ?? 0);
+            $usuarioSvc->atualizar(
+                $id,
+                trim($_POST['nome_usuario'] ?? ''),
+                trim($_POST['email_usuario'] ?? ''),
+                $_POST['perfil_usuario'] ?? 'professor',
+                isset($_POST['email_verificado']) ? 1 : 0
+            );
+            if ($id === (int) $id_usuario_logado) {
+                $_SESSION['nome']  = trim($_POST['nome_usuario']);
+                $_SESSION['email'] = trim($_POST['email_usuario']);
+            }
+            $flashUsuarios = '<div class="alert alert-success alert-autohide mb-4"><i class="bi bi-check-circle me-2"></i>Usuário atualizado.</div>';
+        } elseif (isset($_POST['admin_excluir_usuario'])) {
+            $usuarioSvc->excluir((int) ($_POST['id_usuario'] ?? 0), (int) $id_usuario_logado);
+            $flashUsuarios = '<div class="alert alert-info alert-autohide mb-4"><i class="bi bi-trash me-2"></i>Usuário removido.</div>';
+        } elseif (isset($_POST['admin_redefinir_senha'])) {
+            $id = (int) ($_POST['id_usuario'] ?? 0);
+            $nova = $_POST['nova_senha'] ?? '';
+            $conf = $_POST['confirmar_senha'] ?? '';
+            if ($nova !== $conf) {
+                throw new \InvalidArgumentException('As senhas não coincidem.');
+            }
+            $usuarioSvc->definirSenha($id, $nova);
+            $user = $usuarioSvc->buscarPorId($id);
+            if ($user && isset($_POST['enviar_senha_email']) && $mailSvc->isConfigured()) {
+                $mailSvc->enviarSenhaTemporaria($user['email'], $user['nome'], $nova);
+                $flashUsuarios = '<div class="alert alert-success alert-autohide mb-4"><i class="bi bi-envelope-check me-2"></i>Senha definida e enviada por e-mail.</div>';
+            } else {
+                $flashUsuarios = '<div class="alert alert-success alert-autohide mb-4"><i class="bi bi-key me-2"></i>Senha redefinida.</div>';
+            }
+        } elseif (isset($_POST['admin_enviar_reset'])) {
+            $id = (int) ($_POST['id_usuario'] ?? 0);
+            $user = $usuarioSvc->buscarPorId($id);
+            if (!$user) {
+                throw new \InvalidArgumentException('Usuário não encontrado.');
+            }
+            if (!$mailSvc->isConfigured()) {
+                throw new \InvalidArgumentException('SMTP não configurado. Defina MAIL_HOST, MAIL_USERNAME e MAIL_PASSWORD no .env.');
+            }
+            $token = $usuarioSvc->gerarTokenRedefinicao($id);
+            if (!$mailSvc->enviarRedefinicaoSenha($user['email'], $user['nome'], $token)) {
+                throw new \RuntimeException('Falha ao enviar e-mail. Verifique as credenciais SMTP.');
+            }
+            $flashUsuarios = '<div class="alert alert-primary alert-autohide mb-4"><i class="bi bi-envelope me-2"></i>Link de redefinição enviado para ' . htmlspecialchars($user['email']) . '.</div>';
+        } elseif (isset($_POST['admin_enviar_verificacao'])) {
+            $id = (int) ($_POST['id_usuario'] ?? 0);
+            $user = $usuarioSvc->buscarPorId($id);
+            if (!$user) {
+                throw new \InvalidArgumentException('Usuário não encontrado.');
+            }
+            if (!$mailSvc->isConfigured()) {
+                throw new \InvalidArgumentException('SMTP não configurado.');
+            }
+            $token = $usuarioSvc->gerarTokenVerificacao($id);
+            if (!$mailSvc->enviarVerificacaoEmail($user['email'], $user['nome'], $token)) {
+                throw new \RuntimeException('Falha ao enviar e-mail de verificação.');
+            }
+            $flashUsuarios = '<div class="alert alert-success alert-autohide mb-4"><i class="bi bi-envelope-check me-2"></i>E-mail de confirmação enviado.</div>';
+        }
+    } catch (\Throwable $e) {
+        $flashUsuarios = '<div class="alert alert-danger alert-autohide mb-4"><i class="bi bi-exclamation-triangle me-2"></i>' . htmlspecialchars($e->getMessage()) . '</div>';
+    }
+
+    if ($flashUsuarios !== null) {
+        $_SESSION['coordenador_flash'] = $flashUsuarios;
+        $_SESSION['coordenador_aba'] = 'sessao-usuarios';
+        header('Location: painel_coordenador.php?aba=sessao-usuarios');
+        exit;
     }
 }
 
@@ -549,10 +634,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-if (!isset($_SESSION['foto_perfil'])) {
-    $stmt = $pdo->prepare("SELECT foto_perfil FROM usuarios WHERE id = :id");
+if (!isset($_SESSION['foto_perfil']) || !isset($_SESSION['email'])) {
+    $stmt = $pdo->prepare("SELECT foto_perfil, email FROM usuarios WHERE id = :id");
     $stmt->execute([':id' => $id_usuario_logado]);
-    $_SESSION['foto_perfil'] = $stmt->fetchColumn();
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($row) {
+        $_SESSION['foto_perfil'] = $row['foto_perfil'] ?? null;
+        $_SESSION['email'] = $row['email'] ?? null;
+    }
 }
 $foto_atual = !empty($_SESSION['foto_perfil']) && file_exists($_SESSION['foto_perfil']) ? $_SESSION['foto_perfil'] : 'uploads/padrao-usuario.png';
 
@@ -838,8 +927,10 @@ $eventos_json = json_encode($eventos_calendario);
 
         // Retorna todas as variáveis geradas para a view
         $vars = get_defined_vars();
-        // Busca lista de usuários para a seção de gestão (antes do unset do $pdo)
-        $vars['lista_usuarios'] = $pdo->query("SELECT id, nome, email, perfil, email_verificado FROM usuarios ORDER BY perfil ASC, nome ASC")->fetchAll(\PDO::FETCH_ASSOC);
+        $usuarioSvc = new UsuarioService();
+        $mailSvc    = new MailService();
+        $vars['lista_usuarios']  = $usuarioSvc->listar();
+        $vars['mail_configurado'] = $mailSvc->isConfigured();
         unset($vars['pdo'], $vars['this']);
         return $this->render('coordenador/painel', $vars);
     }

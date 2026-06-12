@@ -49,8 +49,12 @@ class SOS extends BaseModel {
 
         $html_suporte = '';
         if ($qtd_suporte > 0) {
-            $html_suporte .= '<div class="alert alert-danger alert-sos-notificacao rounded-0 border-0 border-start border-4 border-danger shadow-sm mb-3" role="button" title="Clique para ver os chamados SOS" style="cursor: pointer;">';
-            $html_suporte .= '<strong><i class="bi bi-exclamation-triangle-fill me-2"></i>' . $qtd_suporte . ' chamado(s) SOS pendente(s):</strong> <small class="text-muted">(clique para abrir)</small><ul class="mb-0 mt-2">';
+            $html_suporte .= '<div class="alert-sos-banner alert-sos-notificacao" role="button" title="Clique para ver os chamados">';
+            $html_suporte .= '<div class="alert-sos-banner-header">';
+            $html_suporte .= '<i class="bi bi-headset"></i>';
+            $html_suporte .= '<strong>' . $qtd_suporte . ' chamado(s) aguardando atendimento</strong>';
+            $html_suporte .= '<small>(clique para abrir)</small></div>';
+            $html_suporte .= '<ul class="alert-sos-banner-list">';
             foreach ($chamados as $c) {
                 $html_suporte .= '<li><strong>' . htmlspecialchars($c['professor_nome'] ?? '') . '</strong> — ';
                 $html_suporte .= htmlspecialchars($c['laboratorio'] ?? '') . ': ';

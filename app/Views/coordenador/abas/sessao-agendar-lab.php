@@ -34,8 +34,8 @@
                         <div class="row mb-5">
                             <div class="col-md-4 mb-3 mb-md-0">
                                 <label class="form-label fw-bold text-secondary">Laboratório:</label>
-                                <select class="form-select form-select-lg" name="id_laboratorio" required>
-                                    <option value="">Selecione...</option>
+                                <select class="form-select form-select-lg" name="id_laboratorio" required data-lh-combobox data-lh-create="laboratorios">
+                                    <option value="">Selecione ou busque...</option>
                                     <?php foreach ($laboratorios_cadastrados as $lab): ?>
                                         <option value="<?= $lab['id'] ?>"><?= htmlspecialchars($lab['nome']) ?> (Cap: <?= $lab['capacidade'] ?>)</option>
                                     <?php endforeach; ?>
@@ -43,8 +43,8 @@
                             </div>
                             <div class="col-md-4 mb-3 mb-md-0">
                                 <label class="form-label fw-bold text-secondary">Professor:</label>
-                                <select class="form-select form-select-lg" name="id_professor" required>
-                                    <option value="">Selecione...</option>
+                                <select class="form-select form-select-lg" name="id_professor" required data-lh-combobox>
+                                    <option value="">Selecione ou busque...</option>
                                     <?php foreach ($professores as $prof): ?>
                                         <option value="<?= $prof['id'] ?>"><?= htmlspecialchars($prof['nome']) ?></option>
                                     <?php endforeach; ?>
@@ -52,8 +52,8 @@
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label fw-bold text-secondary">Disciplina:</label>
-                                <select class="form-select form-select-lg" name="id_disciplina" required>
-                                    <option value="">Selecione...</option>
+                                <select class="form-select form-select-lg" name="id_disciplina" required data-lh-combobox data-lh-create="disciplinas">
+                                    <option value="">Selecione ou busque...</option>
                                     <?php foreach ($disciplinas as $disc): ?>
                                         <option value="<?= $disc['id'] ?>"><?= htmlspecialchars($disc['nome']) ?></option>
                                     <?php endforeach; ?>

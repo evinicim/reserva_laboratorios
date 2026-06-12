@@ -82,11 +82,11 @@ class NotificacaoController extends BaseController {
             $items[] = [
                 'id'        => (int) $c['id'],
                 'tipo'      => 'sos',
-                'titulo'    => 'SOS: ' . ($c['professor_nome'] ?? 'Professor'),
+                'titulo'    => 'Chamado: ' . ($c['professor_nome'] ?? 'Professor'),
                 'subtitulo' => ($c['laboratorio'] ?? '') . ' — ' . ($c['mensagem'] ?? ''),
                 'data'      => $hora,
-                'icon'      => 'bi-exclamation-triangle-fill',
-                'color'     => 'danger',
+                'icon'      => 'bi-headset',
+                'color'     => 'attention',
             ];
         }
 

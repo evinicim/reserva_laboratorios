@@ -57,7 +57,7 @@
                                         class="form-control" required></div>
                                 <div class="mb-4"><label class="form-label fw-bold small text-secondary">Período
                                         Letivo:</label><input type="text" name="periodo_letivo" class="form-control"
-                                        required placeholder="Ex: 2026/1"></div>
+                                        required placeholder="Ex: 2026.1" data-lh-pick="semestres" data-lh-create="semestres"></div>
                                 <button type="submit" name="criar_quadro" class="btn btn-primary w-100 fw-bold">Salvar
                                     Quadro</button>
                             </form>
@@ -89,7 +89,7 @@
                                     <div class="mb-4">
                                         <label class="form-label fw-bold small text-secondary">Novo Período Letivo:</label>
                                         <input type="text" name="novo_periodo_letivo" class="form-control" required
-                                            placeholder="Ex: 2026/2">
+                                            placeholder="Ex: 2026.2" data-lh-pick="semestres" data-lh-create="semestres">
                                     </div>
                                     <button type="submit" name="duplicar_quadro"
                                         class="btn btn-warning w-100 fw-bold text-dark"><i class="bi bi-magic me-2"></i>
@@ -122,7 +122,7 @@
                                 <div class="row g-3">
                                     <div class="col-md-3">
                                         <label class="form-label fw-bold small text-secondary">Curso:</label>
-                                        <select class="form-select bg-light" name="curso_aula" required>
+                                        <select class="form-select bg-light" name="curso_aula" required data-lh-combobox data-lh-create="cursos" data-lh-value="nome">
                                             <option value="">Selecione...</option>
                                             <?php foreach ($cursos_cadastrados as $c): ?>
                                                 <option value="<?= htmlspecialchars($c['nome']) ?>">
@@ -132,7 +132,7 @@
                                     </div>
                                     <div class="col-md-2">
                                         <label class="form-label fw-bold small text-secondary">Semestre:</label>
-                                        <select class="form-select bg-light" name="semestre_aula" required>
+                                        <select class="form-select bg-light" name="semestre_aula" required data-lh-combobox data-lh-create="semestres" data-lh-value="nome">
                                             <option value="">Selecione...</option>
                                             <?php foreach ($semestres_cadastrados as $sem): ?>
                                                 <option value="<?= htmlspecialchars($sem['nome']) ?>">
@@ -142,7 +142,7 @@
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label fw-bold small text-secondary">Disciplina:</label>
-                                        <select class="form-select bg-light" name="id_disciplina_aula" required>
+                                        <select class="form-select bg-light" name="id_disciplina_aula" required data-lh-combobox data-lh-create="disciplinas">
                                             <option value="">Selecione a matéria...</option>
                                             <?php foreach ($disciplinas as $d): ?>
                                                 <option value="<?= $d['id'] ?>"><?= htmlspecialchars($d['nome']) ?></option>
@@ -152,7 +152,7 @@
                                     <div class="col-md-3">
                                         <label class="form-label fw-bold small text-secondary">Professor:</label>
                                         <select class="form-select bg-light border-primary border-opacity-50"
-                                            name="id_professor_aula" required>
+                                            name="id_professor_aula" required data-lh-combobox>
                                             <option value="">Selecione o docente...</option>
                                             <?php foreach ($professores as $p): ?>
                                                 <option value="<?= $p['id'] ?>"><?= htmlspecialchars($p['nome']) ?></option>
@@ -234,7 +234,7 @@
                                                 class="bi bi-pc-display me-1"></i> Laboratório Especializado
                                             (Opcional):</label>
                                         <select class="form-select border-primary" name="id_laboratorio_aula"
-                                            style="background-color: rgba(13, 110, 253, 0.05);">
+                                            style="background-color: rgba(13, 110, 253, 0.05);" data-lh-combobox data-lh-create="laboratorios">
                                             <option value="">Nenhum laboratório...</option>
                                             <?php foreach ($laboratorios_cadastrados as $lab): ?>
                                                 <option value="<?= $lab['id'] ?>"><?= htmlspecialchars($lab['nome']) ?>
@@ -250,7 +250,7 @@
                                     <div class="row g-3">
                                         <div class="col-md-4">
                                             <label class="form-label small text-secondary mb-1 fw-bold">Bloco:</label>
-                                            <select class="form-select border-success border-opacity-50" name="bloco_aula">
+                                            <select class="form-select border-success border-opacity-50" name="bloco_aula" data-lh-combobox data-lh-create="blocos" data-lh-value="nome">
                                                 <option value="">Nenhum...</option>
                                                 <?php foreach ($blocos_cadastrados as $b): ?>
                                                     <option value="<?= htmlspecialchars($b['nome']) ?>">
@@ -260,7 +260,7 @@
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label small text-secondary mb-1 fw-bold">Andar:</label>
-                                            <select class="form-select border-success border-opacity-50" name="andar_aula">
+                                            <select class="form-select border-success border-opacity-50" name="andar_aula" data-lh-combobox data-lh-create="andares" data-lh-value="nome">
                                                 <option value="">Nenhum...</option>
                                                 <?php foreach ($andares_cadastrados as $a): ?>
                                                     <option value="<?= htmlspecialchars($a['nome']) ?>">
@@ -270,7 +270,7 @@
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label small text-secondary mb-1 fw-bold">Sala:</label>
-                                            <select class="form-select border-success border-opacity-50" name="sala_aula">
+                                            <select class="form-select border-success border-opacity-50" name="sala_aula" data-lh-combobox data-lh-create="salas" data-lh-value="nome">
                                                 <option value="">Nenhuma...</option>
                                                 <?php foreach ($salas_cadastradas as $s): ?>
                                                     <option value="<?= htmlspecialchars($s['nome']) ?>">
@@ -357,7 +357,7 @@
                                     <div class="grade-corpo coluna-sortable" data-dia="<?= $dia ?>" style="min-height: 150px;">
                                         <?php
                                         if (empty($aulas_do_quadro[$dia])) {
-                                            echo "<div class='text-center mt-4 text-muted small opacity-50 fw-bold'><i class='bi bi-cup-hot fs-4 d-block mb-1'></i>Livre</div>";
+                                            echo "<div class='grade-slot-livre text-center mt-4 text-muted small opacity-50 fw-bold'><i class='bi bi-cup-hot fs-4 d-block mb-1'></i>Livre</div>";
                                         } else {
                                             $aulas_dia = $aulas_do_quadro[$dia];
                                             foreach ($aulas_dia as $a) {
@@ -367,6 +367,7 @@
                                                 $classe_ead = ($a['modalidade'] === 'EAD') ? 'aula-ead-glass' : '';
                                                 ?>
                                                 <div class="aula-card-google <?= $classe_turno ?> <?= $classe_ead ?> card-grade-aula"
+                                                    data-id-aula="<?= (int) $a['id'] ?>"
                                                     data-turno="<?= htmlspecialchars($a['turno']) ?>"
                                                     data-curso="<?= htmlspecialchars($a['curso']) ?>"
                                                     data-modalidade="<?= htmlspecialchars($a['modalidade']) ?>">
@@ -488,7 +489,7 @@
                                                                         <div class="col-md-3"><label
                                                                                 class="form-label fw-bold small text-secondary">Curso:</label><select
                                                                                 class="form-select" name="curso_aula"
-                                                                                required><?php foreach ($cursos_cadastrados as $c): ?>
+                                                                                required data-lh-combobox data-lh-create="cursos" data-lh-value="nome"><?php foreach ($cursos_cadastrados as $c): ?>
                                                                                     <option value="<?= htmlspecialchars($c['nome']) ?>"
                                                                                         <?= $c['nome'] == $a['curso'] ? 'selected' : '' ?>>
                                                                                         <?= htmlspecialchars($c['nome']) ?>
@@ -497,7 +498,7 @@
                                                                             </select></div>
                                                                         <div class="col-md-3"><label
                                                                                 class="form-label fw-bold small text-secondary">Semestre:</label><select
-                                                                                class="form-select" name="semestre_aula" required>
+                                                                                class="form-select" name="semestre_aula" required data-lh-combobox data-lh-create="semestres" data-lh-value="nome">
                                                                                 <option value="">Selecione...</option>
                                                                                 <?php foreach ($semestres_cadastrados as $sem): ?>
                                                                                     <option value="<?= htmlspecialchars($sem['nome']) ?>"
@@ -509,7 +510,7 @@
                                                                         <div class="col-md-4"><label
                                                                                 class="form-label fw-bold small text-secondary">Disciplina:</label><select
                                                                                 class="form-select" name="id_disciplina_aula"
-                                                                                required><?php foreach ($disciplinas as $d): ?>
+                                                                                required data-lh-combobox data-lh-create="disciplinas"><?php foreach ($disciplinas as $d): ?>
                                                                                     <option value="<?= $d['id'] ?>"
                                                                                         <?= $d['id'] == $a['id_disciplina'] ? 'selected' : '' ?>><?= htmlspecialchars($d['nome']) ?></option>
                                                                                 <?php endforeach; ?>
@@ -517,7 +518,7 @@
                                                                         <div class="col-md-4"><label
                                                                                 class="form-label fw-bold small text-secondary">Professor:</label><select
                                                                                 class="form-select" name="id_professor_aula"
-                                                                                required><?php foreach ($professores as $p): ?>
+                                                                                required data-lh-combobox><?php foreach ($professores as $p): ?>
                                                                                     <option value="<?= $p['id'] ?>"
                                                                                         <?= $p['id'] == $a['id_professor'] ? 'selected' : '' ?>><?= htmlspecialchars($p['nome']) ?>
                                                                                     </option><?php endforeach; ?>
@@ -564,7 +565,7 @@
                                                                                 Laboratório:</label>
                                                                             <select class="form-select border-primary"
                                                                                 name="id_laboratorio_aula"
-                                                                                style="background-color: rgba(13, 110, 253, 0.05);">
+                                                                                style="background-color: rgba(13, 110, 253, 0.05);" data-lh-combobox data-lh-create="laboratorios">
                                                                                 <option value="">Nenhum...</option>
                                                                                 <?php foreach ($laboratorios_cadastrados as $lab): ?>
                                                                                     <option value="<?= $lab['id'] ?>"
@@ -585,7 +586,7 @@
                                                                                 <div class="col-md-4"><label
                                                                                         class="form-label small text-secondary mb-1">Bloco:</label><select
                                                                                         class="form-select border-success"
-                                                                                        name="bloco_aula">
+                                                                                        name="bloco_aula" data-lh-combobox data-lh-create="blocos" data-lh-value="nome">
                                                                                         <option value="">Nenhum...</option>
                                                                                         <?php foreach ($blocos_cadastrados as $b): ?>
                                                                                             <option
@@ -596,7 +597,7 @@
                                                                                 <div class="col-md-4"><label
                                                                                         class="form-label small text-secondary mb-1">Andar:</label><select
                                                                                         class="form-select border-success"
-                                                                                        name="andar_aula">
+                                                                                        name="andar_aula" data-lh-combobox data-lh-create="andares" data-lh-value="nome">
                                                                                         <option value="">Nenhum...</option>
                                                                                         <?php foreach ($andares_cadastrados as $a_db): ?>
                                                                                             <option
@@ -607,7 +608,7 @@
                                                                                 <div class="col-md-4"><label
                                                                                         class="form-label small text-secondary mb-1">Sala:</label><select
                                                                                         class="form-select border-success"
-                                                                                        name="sala_aula">
+                                                                                        name="sala_aula" data-lh-combobox data-lh-create="salas" data-lh-value="nome">
                                                                                         <option value="">Nenhum...</option>
                                                                                         <?php foreach ($salas_cadastradas as $s): ?>
                                                                                             <option

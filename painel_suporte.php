@@ -44,7 +44,8 @@ if (isset($_FILES['nova_foto']) && $_FILES['nova_foto']['error'] === UPLOAD_ERR_
                 $stmt = $pdo->prepare("UPDATE usuarios SET foto_perfil = :foto WHERE id = :id");
                 $stmt->execute([':foto' => $destino, ':id' => $id_usuario_logado]);
                 $_SESSION['foto_perfil'] = $destino;
-                $mensagem = '<div class="alert alert-success alert-autohide rounded-0 border-0 border-start border-4 border-success shadow-sm mb-4">Foto atualizada com sucesso!</div>';
+                header('Location: painel_suporte.php?aba=sessao-perfil&foto=ok');
+                exit;
             } catch (PDOException $e) { $mensagem = '<div class="alert alert-danger alert-autohide mb-4">Erro ao salvar foto.</div>'; }
         }
     }
@@ -61,13 +62,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['resolver_chamado'])) {
     }
 }
 
-if (!isset($_SESSION['foto_perfil'])) {
-    $stmt = $pdo->prepare("SELECT foto_perfil FROM usuarios WHERE id = :id");
+if (!isset($_SESSION['foto_perfil']) || !isset($_SESSION['email'])) {
+    $stmt = $pdo->prepare("SELECT email, foto_perfil FROM usuarios WHERE id = :id");
     $stmt->execute([':id' => $id_usuario_logado]);
     $user_data = $stmt->fetch(PDO::FETCH_ASSOC);
-    $_SESSION['foto_perfil'] = $user_data['foto_perfil'] ?? null;
+    if ($user_data) {
+        $_SESSION['foto_perfil'] = $user_data['foto_perfil'] ?? null;
+        $_SESSION['email'] = $user_data['email'] ?? null;
+    }
 }
 $foto_atual = !empty($_SESSION['foto_perfil']) && file_exists($_SESSION['foto_perfil']) ? $_SESSION['foto_perfil'] : 'uploads/padrao-usuario.png';
+
+if (isset($_GET['foto']) && $_GET['foto'] === 'ok') {
+    $mensagem = '<div class="alert alert-success alert-autohide rounded-0 border-0 border-start border-4 border-success shadow-sm mb-4"><i class="bi bi-check-circle-fill me-2"></i>Foto atualizada com sucesso!</div>';
+}
 
 // --- BUSCAS DE DADOS ---
 $alertas_suporte = [];
@@ -254,8 +262,7 @@ function renderizarCardSuporte($l, $chaves_em_uso_assoc, $borda) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="css/notificacoes-nav.css">
-    
-    <script>
+    <link rel="stylesheet" href="css/labhub-alerts.css">
         const savedTheme = localStorage.getItem('tema-uniceplac') || 'light';
         document.documentElement.setAttribute('data-bs-theme', savedTheme);
     </script>
@@ -281,7 +288,6 @@ function renderizarCardSuporte($l, $chaves_em_uso_assoc, $borda) {
         .top-icon-btn:hover { color: var(--verde-uniceplac); }
         
         @keyframes sos-pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
-        .sos-active .bi-bell { color: #dc3545 !important; animation: sos-pulse 0.8s infinite; }
         
         @keyframes heartbeat { 0% { transform: scale(1); } 20% { transform: scale(1.05); } 40% { transform: scale(1); } 60% { transform: scale(1.05); } 80% { transform: scale(1); } 100% { transform: scale(1); } }
         .heartbeat { animation: heartbeat 1.5s infinite; }
@@ -395,7 +401,8 @@ function renderizarCardSuporte($l, $chaves_em_uso_assoc, $borda) {
                 require __DIR__ . '/app/Views/partials/notificacoes-nav.php';
                 ?>
                 <div class="me-3 top-icon-btn" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"><i class="bi bi-grid-3x3-gap fs-5"></i></div>
-                <img src="<?= htmlspecialchars($foto_atual) ?>" alt="Foto" class="avatar-img-small ms-1" id="btnAlterarFotoNav">
+                <img src="<?= htmlspecialchars($foto_atual) ?>" alt="Foto" class="avatar-img-small ms-1" id="btnAlterarFotoNav"
+                    title="Meu perfil" style="cursor:pointer;" onclick="showSection('sessao-perfil')">
             </div>
         </div>
     </nav>
@@ -415,14 +422,15 @@ function renderizarCardSuporte($l, $chaves_em_uso_assoc, $borda) {
                 <div class="p-3 text-muted small fw-bold text-uppercase opacity-50">Operacional</div>
                 <a href="#sessao-mapa-diario" class="offcanvas-menu-link active-link"><i class="bi bi-speedometer2 text-primary me-2"></i> Mapa Diário</a>
                 <a href="#sessao-sos-ativos" class="offcanvas-menu-link">
-                    <i class="bi bi-exclamation-triangle-fill text-danger me-2"></i> SOS Ativos
-                    <span id="badge-sos-menu" class="badge bg-danger ms-2 <?= $qtd_alertas > 0 ? '' : 'd-none' ?>"><?= $qtd_alertas ?></span>
+                    <i class="bi bi-headset text-sos-attention me-2"></i> Chamados Ativos
+                    <span id="badge-sos-menu" class="badge badge-sos-count ms-2 <?= $qtd_alertas > 0 ? '' : 'd-none' ?>"><?= $qtd_alertas ?></span>
                 </a>
                 <a href="#sessao-labs" class="offcanvas-menu-link"><i class="bi bi-pc-display text-secondary me-2"></i> Laboratórios</a>
                 
                 <div class="p-3 text-muted small fw-bold text-uppercase opacity-50 border-top mt-2">Relatórios Gerenciais</div>
                 <a href="#sessao-historico-chaves" class="offcanvas-menu-link"><i class="bi bi-key text-info me-2"></i> Histórico de Chaves</a>
                 <a href="#sessao-historico-chamados" class="offcanvas-menu-link"><i class="bi bi-headset text-success me-2"></i> Chamados Atendidos</a>
+                <a href="javascript:void(0);" onclick="showSection('sessao-perfil'); bootstrap.Offcanvas.getInstance(document.getElementById('sidebarMenu'))?.hide();" class="offcanvas-menu-link"><i class="bi bi-person-circle text-secondary me-2"></i> Meu Perfil</a>
                 
                 <?php if($_SESSION['perfil'] === 'coordenador'): ?>
                     <hr class="my-2 mx-3 border-secondary opacity-25">
@@ -443,12 +451,12 @@ function renderizarCardSuporte($l, $chaves_em_uso_assoc, $borda) {
         <div id="area-chamados-dinamica"></div>
         
         <div id="sessao-sos-ativos" class="content-section">
-            <div class="card shadow-sm border-0 mb-4" style="border-top: 4px solid #dc3545;">
+            <div class="card shadow-sm border-0 mb-4 card-sos-attention">
                 <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0 fw-bold text-danger d-flex align-items-center">
-                        <i class="bi bi-exclamation-triangle-fill me-3 fs-4"></i> Chamados SOS Pendentes
+                    <h5 class="mb-0 fw-bold d-flex align-items-center">
+                        <i class="bi bi-headset me-3 fs-4"></i> Chamados aguardando atendimento
                     </h5>
-                    <span class="badge bg-danger rounded-pill px-3 py-2"><?= $qtd_alertas ?> abertos</span>
+                    <span class="badge badge-sos-count rounded-pill px-3 py-2"><?= $qtd_alertas ?> abertos</span>
                 </div>
                 <div class="card-body p-0">
                     <?php if ($qtd_alertas > 0): ?>
@@ -459,17 +467,26 @@ function renderizarCardSuporte($l, $chaves_em_uso_assoc, $borda) {
                                         <th class="ps-4 py-3">Data/Hora</th>
                                         <th>Professor</th>
                                         <th>Laboratório</th>
-                                        <th>Problema</th>
+                                        <th style="min-width: 220px;">Problema</th>
                                         <th class="pe-4">Ação</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php foreach ($alertas_suporte as $ch): ?>
-                                        <tr class="border-start border-3 border-danger" data-sos-id="<?= (int) $ch['id'] ?>">
+                                        <tr class="tr-sos-attention" data-sos-id="<?= (int) $ch['id'] ?>">
                                             <td class="ps-4"><strong><?= date('d/m H:i', strtotime($ch['data_hora'])) ?></strong></td>
                                             <td><?= htmlspecialchars($ch['professor_nome']) ?></td>
                                             <td class="fw-bold text-dark"><?= htmlspecialchars($ch['laboratorio']) ?></td>
-                                            <td class="text-muted small" style="max-width:250px;"><?= htmlspecialchars(mb_substr($ch['mensagem'],0,80)) ?>...</td>
+                                            <td class="sos-problema-cell text-muted small">
+                                                <?php
+                                                $msg = trim($ch['mensagem'] ?? '');
+                                                $msgLonga = mb_strlen($msg) > 120;
+                                                ?>
+                                                <div class="sos-problema-text<?= $msgLonga ? ' sos-problema-collapsed' : '' ?>"><?= nl2br(htmlspecialchars($msg)) ?></div>
+                                                <?php if ($msgLonga): ?>
+                                                    <button type="button" class="sos-problema-toggle">Ver descrição completa</button>
+                                                <?php endif; ?>
+                                            </td>
                                             <td class="pe-4">
                                                 <form method="POST" action="painel_suporte.php" class="d-inline">
                                                     <input type="hidden" name="resolver_chamado" value="1">
@@ -487,7 +504,7 @@ function renderizarCardSuporte($l, $chaves_em_uso_assoc, $borda) {
                     <?php else: ?>
                         <div class="text-center py-5">
                             <i class="bi bi-check-circle fs-1 text-success opacity-50 d-block mb-2"></i>
-                            <p class="text-muted mb-0">Nenhum chamado SOS pendente. Tudo tranquilo!</p>
+                            <p class="text-muted mb-0">Nenhum chamado pendente. Tudo tranquilo!</p>
                         </div>
                     <?php endif; ?>
                 </div>
@@ -695,8 +712,9 @@ function renderizarCardSuporte($l, $chaves_em_uso_assoc, $borda) {
             </div>
         </div>
 
-    </div>
+        <?php require __DIR__ . '/app/Views/partials/sessao-perfil.php'; ?>
 
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/notificacoes-nav.js"></script>
     
@@ -826,6 +844,16 @@ function renderizarCardSuporte($l, $chaves_em_uso_assoc, $borda) {
                 });
             }
 
+            document.addEventListener('click', function (e) {
+                const btn = e.target.closest('.sos-problema-toggle');
+                if (!btn) return;
+                e.preventDefault();
+                const text = btn.closest('.sos-problema-cell')?.querySelector('.sos-problema-text');
+                if (!text) return;
+                const collapsed = text.classList.toggle('sos-problema-collapsed');
+                btn.textContent = collapsed ? 'Ver descrição completa' : 'Ver menos';
+            });
+
             initNotificacoesNav({
                 verTodasFn: 'abrirSosAtivos',
                 badgeIds: ['badge-sos-menu'],
@@ -834,8 +862,11 @@ function renderizarCardSuporte($l, $chaves_em_uso_assoc, $borda) {
                 pollInterval: 120000
             });
 
-            let hashURL = window.location.hash.replace('#', '') || "sessao-mapa-diario";
+            let hashURL = new URLSearchParams(window.location.search).get('aba') || window.location.hash.replace('#', '') || "sessao-mapa-diario";
             showSection(hashURL);
+            if (new URLSearchParams(window.location.search).get('aba')) {
+                window.history.replaceState(null, null, '#' + hashURL);
+            }
 
             document.querySelectorAll('.offcanvas-menu-link').forEach(link => {
                 link.addEventListener('click', function(e) {
@@ -858,10 +889,8 @@ function renderizarCardSuporte($l, $chaves_em_uso_assoc, $borda) {
             setInterval(monitorarTempoReal, 120000);
             monitorarTempoReal();
             
-            const btnFoto = document.getElementById('btnAlterarFotoNav');
             const inputFoto = document.getElementById('nova_foto_input');
-            if(btnFoto && inputFoto) {
-                btnFoto.addEventListener('click', () => inputFoto.click());
+            if (inputFoto) {
                 inputFoto.addEventListener('change', function() {
                     if (this.value) document.getElementById('formFotoPerfil').submit();
                 });
