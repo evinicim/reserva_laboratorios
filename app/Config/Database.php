@@ -49,6 +49,8 @@ class Database {
 
         $port = app_env('DB_PORT', $driver === 'pgsql' ? '5432' : '3306');
 
+        [$host, $port] = app_normalize_db_host_port($host, $port);
+
         $cloudSql = app_env('CLOUD_SQL_CONNECTION_NAME');
 
 

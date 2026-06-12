@@ -5,6 +5,18 @@ function app_db_driver(): string
     return app_env('DB_CONNECTION', 'mysql') ?? 'mysql';
 }
 
+/** Corrige pooler Supabase sa-east-1 (projeto no aws-1, não aws-0). */
+function app_normalize_db_host_port(string $host, string $port): array
+{
+    if ($host === 'aws-0-sa-east-1.pooler.supabase.com') {
+        $host = 'aws-1-sa-east-1.pooler.supabase.com';
+        if ($port === '6543') {
+            $port = '5432';
+        }
+    }
+    return [$host, $port];
+}
+
 function app_build_pdo_dsn(
     string $driver,
     string $host,
