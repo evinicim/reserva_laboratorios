@@ -50,7 +50,10 @@ class MailService {
         curl_close($ch);
 
         if ($response === false || $httpCode < 200 || $httpCode >= 300) {
-            error_log('[MailService] brevo_api: HTTP ' . $httpCode . ' ' . ($error ?: (string) $response));
+            $hint = str_contains((string) $response, 'unrecognised IP') || str_contains((string) $response, 'Unauthorized IP')
+                ? ' Autorize o IP do servidor em https://app.brevo.com/security/authorised_ips'
+                : '';
+            error_log('[MailService] brevo_api: HTTP ' . $httpCode . ' ' . ($error ?: (string) $response) . $hint);
             return false;
         }
 
@@ -95,7 +98,11 @@ class MailService {
             $mail->send();
             return true;
         } catch (\Throwable $e) {
-            error_log('[MailService] smtp: ' . $e->getMessage());
+            $msg = $e->getMessage();
+            if (str_contains($msg, 'Unauthorized IP') || str_contains($msg, '525')) {
+                $msg .= ' — autorize o IP em https://app.brevo.com/security/authorised_ips';
+            }
+            error_log('[MailService] smtp: ' . $msg);
             return false;
         }
     }

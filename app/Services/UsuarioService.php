@@ -25,6 +25,15 @@ class UsuarioService {
         return $row ?: null;
     }
 
+    public function buscarPorEmail(string $email): ?array {
+        $stmt = $this->pdo->prepare(
+            'SELECT id, nome, email, perfil, email_verificado FROM usuarios WHERE LOWER(email) = LOWER(?) LIMIT 1'
+        );
+        $stmt->execute([trim($email)]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ?: null;
+    }
+
     public function criar(string $nome, string $email, string $perfil, string $senha = '', int $emailVerificado = 1): int {
         if (!in_array($perfil, ['coordenador', 'professor', 'suporte'], true)) {
             throw new \InvalidArgumentException('Perfil inválido.');
@@ -33,10 +42,13 @@ class UsuarioService {
             throw new \InvalidArgumentException('Use um e-mail @uniceplac.edu.br.');
         }
 
-        $dup = $this->pdo->prepare('SELECT id FROM usuarios WHERE LOWER(email) = LOWER(?) LIMIT 1');
+        $dup = $this->pdo->prepare('SELECT id, nome FROM usuarios WHERE LOWER(email) = LOWER(?) LIMIT 1');
         $dup->execute([trim($email)]);
-        if ($dup->fetchColumn()) {
-            throw new \InvalidArgumentException('Este e-mail já está cadastrado.');
+        $existente = $dup->fetch(PDO::FETCH_ASSOC);
+        if ($existente) {
+            throw new \InvalidArgumentException(
+                'Este e-mail já pertence a «' . $existente['nome'] . '». Veja na lista abaixo ou use outro e-mail.'
+            );
         }
 
         if ($senha !== '' && strlen($senha) < 6) {
@@ -45,10 +57,10 @@ class UsuarioService {
 
         $hash = $senha !== '' ? password_hash($senha, PASSWORD_DEFAULT) : null;
         $stmt = $this->pdo->prepare(
-            'INSERT INTO usuarios (nome, email, senha, perfil, email_verificado) VALUES (?, ?, ?, ?, ?)'
+            'INSERT INTO usuarios (nome, email, senha, perfil, email_verificado) VALUES (?, ?, ?, ?, ?) RETURNING id'
         );
         $stmt->execute([trim($nome), trim($email), $hash, $perfil, $emailVerificado ? 1 : 0]);
-        return (int) $this->pdo->lastInsertId();
+        return (int) $stmt->fetchColumn();
     }
 
     public function atualizar(int $id, string $nome, string $email, string $perfil, int $emailVerificado): void {

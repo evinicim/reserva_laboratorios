@@ -15,6 +15,7 @@
             <p class="text-muted small mb-0">
                 <i class="bi bi-info-circle me-1"></i>
                 Cadastre, edite dados, redefina senhas ou envie e-mail de recuperação.
+                Usuários com status <span class="badge bg-warning text-dark">Pendente</span> já estão no banco — use o botão de envelope para reenviar confirmação.
                 Professores também podem se cadastrar em <a href="cadastro.php" target="_blank" rel="noopener">Solicitar Cadastro</a> (perfil Professor).
                 <?php if (empty($mail_configurado)): ?>
                     <span class="text-warning fw-semibold">SMTP não configurado — envios por e-mail ficarão indisponíveis até definir MAIL_* no .env.</span>

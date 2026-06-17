@@ -136,20 +136,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($senha !== '' && $senha !== $conf) {
                 throw new \InvalidArgumentException('As senhas não coincidem.');
             }
+            $emailVerificado = isset($_POST['email_verificado']) ? 1 : 0;
             $id = $usuarioSvc->criar(
                 trim($_POST['nome_usuario'] ?? ''),
                 trim($_POST['email_usuario'] ?? ''),
                 $_POST['perfil_usuario'] ?? 'professor',
                 $senha,
-                isset($_POST['email_verificado']) ? 1 : 0
+                $emailVerificado
             );
             $user = $usuarioSvc->buscarPorId($id);
-            if ($user && $senha !== '' && isset($_POST['enviar_senha_email']) && $mailSvc->isConfigured()) {
-                $mailSvc->enviarSenhaTemporaria($user['email'], $user['nome'], $senha);
-                $flashUsuarios = '<div class="alert alert-success alert-autohide mb-4"><i class="bi bi-person-plus me-2"></i>Usuário criado e senha enviada por e-mail.</div>';
-            } else {
-                $flashUsuarios = '<div class="alert alert-success alert-autohide mb-4"><i class="bi bi-person-plus me-2"></i>Usuário criado com sucesso.</div>';
+            if (!$user) {
+                throw new \RuntimeException('Usuário criado, mas não apareceu na lista. Atualize a página.');
             }
+
+            $avisosEmail = [];
+            if (!$emailVerificado && $mailSvc->isConfigured()) {
+                $token = $usuarioSvc->gerarTokenVerificacao($id);
+                if ($mailSvc->enviarVerificacaoEmail($user['email'], $user['nome'], $token)) {
+                    $avisosEmail[] = 'E-mail de confirmação enviado para ' . $user['email'] . '.';
+                } else {
+                    $avisosEmail[] = 'Usuário salvo como <strong>Pendente</strong>, mas o e-mail não foi enviado (verifique Brevo). Use o botão <i class="bi bi-envelope"></i> na lista para reenviar.';
+                }
+            } elseif ($senha !== '' && isset($_POST['enviar_senha_email']) && $mailSvc->isConfigured()) {
+                if ($mailSvc->enviarSenhaTemporaria($user['email'], $user['nome'], $senha)) {
+                    $avisosEmail[] = 'Senha enviada por e-mail.';
+                } else {
+                    $avisosEmail[] = 'Usuário criado, mas a senha <strong>não</strong> foi enviada por e-mail (verifique Brevo).';
+                }
+            } elseif (!$emailVerificado && !$mailSvc->isConfigured()) {
+                $avisosEmail[] = 'Usuário criado como <strong>Pendente</strong>. Marque «E-mail verificado» ou configure MAIL_* para enviar confirmação.';
+            }
+
+            $classe = str_contains(implode(' ', $avisosEmail), 'não') ? 'alert-warning' : 'alert-success';
+            $extra  = $avisosEmail !== [] ? ' ' . implode(' ', $avisosEmail) : '';
+            $flashUsuarios = '<div class="alert ' . $classe . ' alert-autohide mb-4"><i class="bi bi-person-plus me-2"></i>Usuário <strong>' . htmlspecialchars($user['nome']) . '</strong> criado.' . $extra . '</div>';
         } elseif (isset($_POST['admin_editar_usuario'])) {
             $id = (int) ($_POST['id_usuario'] ?? 0);
             $usuarioSvc->atualizar(
