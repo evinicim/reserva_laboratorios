@@ -130,7 +130,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $flashUsuarios = null;
 
     try {
-        if (isset($_POST['admin_editar_usuario'])) {
+        if (isset($_POST['admin_criar_usuario'])) {
+            $senha = $_POST['nova_senha'] ?? '';
+            $conf  = $_POST['confirmar_senha'] ?? '';
+            if ($senha !== '' && $senha !== $conf) {
+                throw new \InvalidArgumentException('As senhas não coincidem.');
+            }
+            $id = $usuarioSvc->criar(
+                trim($_POST['nome_usuario'] ?? ''),
+                trim($_POST['email_usuario'] ?? ''),
+                $_POST['perfil_usuario'] ?? 'professor',
+                $senha,
+                isset($_POST['email_verificado']) ? 1 : 0
+            );
+            $user = $usuarioSvc->buscarPorId($id);
+            if ($user && $senha !== '' && isset($_POST['enviar_senha_email']) && $mailSvc->isConfigured()) {
+                $mailSvc->enviarSenhaTemporaria($user['email'], $user['nome'], $senha);
+                $flashUsuarios = '<div class="alert alert-success alert-autohide mb-4"><i class="bi bi-person-plus me-2"></i>Usuário criado e senha enviada por e-mail.</div>';
+            } else {
+                $flashUsuarios = '<div class="alert alert-success alert-autohide mb-4"><i class="bi bi-person-plus me-2"></i>Usuário criado com sucesso.</div>';
+            }
+        } elseif (isset($_POST['admin_editar_usuario'])) {
             $id = (int) ($_POST['id_usuario'] ?? 0);
             $usuarioSvc->atualizar(
                 $id,

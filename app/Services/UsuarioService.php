@@ -25,6 +25,32 @@ class UsuarioService {
         return $row ?: null;
     }
 
+    public function criar(string $nome, string $email, string $perfil, string $senha = '', int $emailVerificado = 1): int {
+        if (!in_array($perfil, ['coordenador', 'professor', 'suporte'], true)) {
+            throw new \InvalidArgumentException('Perfil inválido.');
+        }
+        if (!preg_match('/@uniceplac\.edu\.br$/i', $email)) {
+            throw new \InvalidArgumentException('Use um e-mail @uniceplac.edu.br.');
+        }
+
+        $dup = $this->pdo->prepare('SELECT id FROM usuarios WHERE LOWER(email) = LOWER(?) LIMIT 1');
+        $dup->execute([trim($email)]);
+        if ($dup->fetchColumn()) {
+            throw new \InvalidArgumentException('Este e-mail já está cadastrado.');
+        }
+
+        if ($senha !== '' && strlen($senha) < 6) {
+            throw new \InvalidArgumentException('A senha deve ter pelo menos 6 caracteres.');
+        }
+
+        $hash = $senha !== '' ? password_hash($senha, PASSWORD_DEFAULT) : null;
+        $stmt = $this->pdo->prepare(
+            'INSERT INTO usuarios (nome, email, senha, perfil, email_verificado) VALUES (?, ?, ?, ?, ?)'
+        );
+        $stmt->execute([trim($nome), trim($email), $hash, $perfil, $emailVerificado ? 1 : 0]);
+        return (int) $this->pdo->lastInsertId();
+    }
+
     public function atualizar(int $id, string $nome, string $email, string $perfil, int $emailVerificado): void {
         if (!in_array($perfil, ['coordenador', 'professor', 'suporte'], true)) {
             throw new \InvalidArgumentException('Perfil inválido.');

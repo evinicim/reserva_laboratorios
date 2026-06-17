@@ -4,12 +4,18 @@
             <h5 class="mb-0 fw-bold" style="color:var(--roxo-uniceplac);">
                 <i class="bi bi-people-fill me-3 fs-4"></i>Usuários do Sistema
             </h5>
-            <span class="badge" style="background:var(--roxo-uniceplac);"><?= count($lista_usuarios) ?> cadastrados</span>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge" style="background:var(--roxo-uniceplac);"><?= count($lista_usuarios) ?> cadastrados</span>
+                <button type="button" class="btn btn-sm btn-uniceplac fw-bold" data-bs-toggle="modal" data-bs-target="#modalNovoUsuario">
+                    <i class="bi bi-person-plus me-1"></i> Novo usuário
+                </button>
+            </div>
         </div>
         <div class="card-body border-bottom bg-light py-3">
             <p class="text-muted small mb-0">
                 <i class="bi bi-info-circle me-1"></i>
-                Edite dados, redefina senhas, envie e-mail de recuperação ou confirmação de e-mail.
+                Cadastre, edite dados, redefina senhas ou envie e-mail de recuperação.
+                Professores também podem se cadastrar em <a href="cadastro.php" target="_blank" rel="noopener">Solicitar Cadastro</a> (perfil Professor).
                 <?php if (empty($mail_configurado)): ?>
                     <span class="text-warning fw-semibold">SMTP não configurado — envios por e-mail ficarão indisponíveis até definir MAIL_* no .env.</span>
                 <?php endif; ?>
@@ -211,4 +217,55 @@
             </div>
         </div>
     <?php endforeach; ?>
+
+    <div class="modal fade" id="modalNovoUsuario" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title fw-bold"><i class="bi bi-person-plus me-2"></i>Novo usuário</h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="POST" action="painel_coordenador.php">
+                    <input type="hidden" name="admin_criar_usuario" value="1">
+                    <div class="modal-body text-start">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Nome completo</label>
+                            <input type="text" name="nome_usuario" class="form-control" required placeholder="Ex: Maria Souza">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">E-mail institucional</label>
+                            <input type="email" name="email_usuario" class="form-control" required placeholder="nome@uniceplac.edu.br">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Perfil</label>
+                            <select name="perfil_usuario" class="form-select" required>
+                                <option value="professor">Professor</option>
+                                <option value="coordenador">Coordenador</option>
+                                <option value="suporte">Suporte TI</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Senha inicial <span class="text-muted fw-normal">(opcional)</span></label>
+                            <input type="password" name="nova_senha" class="form-control mb-2" minlength="6" placeholder="Mínimo 6 caracteres">
+                            <input type="password" name="confirmar_senha" class="form-control" minlength="6" placeholder="Confirmar senha">
+                            <small class="text-muted">Deixe em branco e use o botão de e-mail depois para enviar link de redefinição.</small>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="email_verificado" value="1" id="novoUserVerif" checked>
+                            <label class="form-check-label" for="novoUserVerif">E-mail já verificado (pode acessar imediatamente)</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="enviar_senha_email" value="1" id="novoUserSendPwd"
+                                <?= empty($mail_configurado) ? 'disabled' : '' ?>>
+                            <label class="form-check-label" for="novoUserSendPwd">Enviar senha por e-mail (se preenchida acima)</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary fw-bold">Criar usuário</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
