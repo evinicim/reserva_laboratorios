@@ -31,7 +31,7 @@ RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html \
     && chmod -R 777 /var/www/html/uploads
 
-EXPOSE 80
+EXPOSE 8080
 
-# Inline startup evita falha exit 127 por CRLF em scripts (.sh com \r no shebang)
-CMD ["bash", "-c", "PORT=\"${PORT:-80}\"; sed -i \"s/^Listen .*/Listen ${PORT}/\" /etc/apache2/ports.conf; sed -i \"s/<VirtualHost \\*:80>/<VirtualHost *:${PORT}>/\" /etc/apache2/sites-enabled/000-default.conf; mkdir -p /var/www/html/uploads && chmod -R 777 /var/www/html/uploads; exec apache2-foreground"]
+# Fly.io exige 0.0.0.0:8080 (internal_port no fly.toml)
+CMD ["bash", "-c", "PORT=\"${PORT:-8080}\"; sed -i \"s/^Listen .*/Listen 0.0.0.0:${PORT}/\" /etc/apache2/ports.conf; sed -i \"s/<VirtualHost \\*:80>/<VirtualHost *:${PORT}>/\" /etc/apache2/sites-enabled/000-default.conf; mkdir -p /var/www/html/uploads && chmod -R 777 /var/www/html/uploads; exec apache2-foreground"]

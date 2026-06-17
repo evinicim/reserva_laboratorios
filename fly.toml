@@ -1,0 +1,47 @@
+# Fly.io — LabHub UNICEPLAC (São Paulo, perto do Supabase sa-east-1)
+app = 'labhub-uniceplac-sp'
+primary_region = 'gru'
+
+[build]
+  dockerfile = 'Dockerfile'
+
+[env]
+  PORT = '8080'
+  APP_ENV = 'production'
+  APP_FAST_PANEL = '1'
+  APP_URL = 'https://labhub-uniceplac-sp.fly.dev'
+  DB_CONNECTION = 'pgsql'
+  DB_HOST = 'aws-1-sa-east-1.pooler.supabase.com'
+  DB_PORT = '5432'
+  DB_SSLMODE = 'require'
+  DB_DATABASE = 'postgres'
+  DB_USERNAME = 'postgres.eqawtpbvcqlcemysjkox'
+  MAIL_HOST = 'smtp-relay.brevo.com'
+  MAIL_PORT = '587'
+  MAIL_USERNAME = 'ae8949001@smtp-brevo.com'
+  MAIL_FROM_ADDRESS = 'admin@uniceplac.edu.br'
+  MAIL_FROM_NAME = 'LabHub UNICEPLAC'
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+  [[http_service.checks]]
+    interval = '30s'
+    timeout = '5s'
+    grace_period = '25s'
+    method = 'GET'
+    path = '/index.php'
+
+[[vm]]
+  memory = '512mb'
+  cpu_kind = 'shared'
+  cpus = 1
+
+[mounts]
+  source = 'labhub_uploads'
+  destination = '/var/www/html/uploads'
