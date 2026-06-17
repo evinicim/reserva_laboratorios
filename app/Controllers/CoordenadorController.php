@@ -654,16 +654,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-if (!isset($_SESSION['foto_perfil']) || !isset($_SESSION['email'])) {
-    $stmt = $pdo->prepare("SELECT foto_perfil, email FROM usuarios WHERE id = :id");
-    $stmt->execute([':id' => $id_usuario_logado]);
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-    if ($row) {
-        $_SESSION['foto_perfil'] = $row['foto_perfil'] ?? null;
-        $_SESSION['email'] = $row['email'] ?? null;
-    }
-}
-$foto_atual = !empty($_SESSION['foto_perfil']) && file_exists($_SESSION['foto_perfil']) ? $_SESSION['foto_perfil'] : 'uploads/padrao-usuario.png';
+$foto_atual = app_foto_perfil_usuario($pdo, (int) $id_usuario_logado);
 
 // --- BUSCAS DE DADOS GERAIS ---
 $reservas_pendentes = $pdo->query("SELECT a.*, l.nome as laboratorio, u.nome as professor, d.nome as disciplina FROM agendamentos a JOIN laboratorios l ON a.id_laboratorio = l.id JOIN usuarios u ON a.id_professor = u.id JOIN disciplinas d ON a.id_disciplina = d.id WHERE a.status = 'pendente' ORDER BY a.data_reserva ASC")->fetchAll(PDO::FETCH_ASSOC);

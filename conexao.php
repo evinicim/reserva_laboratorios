@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/app/Config/env.php';
+require_once __DIR__ . '/app/Config/foto_helpers.php';
 
 require_once __DIR__ . '/app/Config/db_dsn.php';
 require_once __DIR__ . '/app/Config/sql_helpers.php';

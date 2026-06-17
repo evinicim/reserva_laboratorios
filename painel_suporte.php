@@ -62,16 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['resolver_chamado'])) {
     }
 }
 
-if (!isset($_SESSION['foto_perfil']) || !isset($_SESSION['email'])) {
-    $stmt = $pdo->prepare("SELECT email, foto_perfil FROM usuarios WHERE id = :id");
-    $stmt->execute([':id' => $id_usuario_logado]);
-    $user_data = $stmt->fetch(PDO::FETCH_ASSOC);
-    if ($user_data) {
-        $_SESSION['foto_perfil'] = $user_data['foto_perfil'] ?? null;
-        $_SESSION['email'] = $user_data['email'] ?? null;
-    }
-}
-$foto_atual = !empty($_SESSION['foto_perfil']) && file_exists($_SESSION['foto_perfil']) ? $_SESSION['foto_perfil'] : 'uploads/padrao-usuario.png';
+$foto_atual = app_foto_perfil_usuario($pdo, (int) $id_usuario_logado);
 
 if (isset($_GET['foto']) && $_GET['foto'] === 'ok') {
     $mensagem = '<div class="alert alert-success alert-autohide rounded-0 border-0 border-start border-4 border-success shadow-sm mb-4"><i class="bi bi-check-circle-fill me-2"></i>Foto atualizada com sucesso!</div>';

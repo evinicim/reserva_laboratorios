@@ -146,16 +146,7 @@ try {
     $meus_ensalamentos = $stmt_ensalamento->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {}
 
-if (!isset($_SESSION['foto_perfil']) || !isset($_SESSION['email'])) {
-    $stmt = $pdo->prepare("SELECT email, foto_perfil FROM usuarios WHERE id = :id");
-    $stmt->execute([':id' => $id_professor_logado]);
-    $dados_user = $stmt->fetch(PDO::FETCH_ASSOC);
-    if ($dados_user) {
-        $_SESSION['foto_perfil'] = $dados_user['foto_perfil'] ?? null;
-        $_SESSION['email'] = $dados_user['email'] ?? null;
-    }
-}
-$foto_atual = !empty($_SESSION['foto_perfil']) && file_exists($_SESSION['foto_perfil']) ? $_SESSION['foto_perfil'] : 'uploads/padrao-usuario.png';
+$foto_atual = app_foto_perfil_usuario($pdo, (int) $id_professor_logado);
 
 $hoje = date('Y-m-d');
 $hoje_en = date('l');

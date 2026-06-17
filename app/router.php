@@ -90,6 +90,7 @@ function executeRouter() {
     $request = Request::capture();
 
     require_once __DIR__ . '/Config/env.php';
+    require_once __DIR__ . '/Config/foto_helpers.php';
     if ($action !== 'login' || ($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET') {
         app_boot_database();
     }
