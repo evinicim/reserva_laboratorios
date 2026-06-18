@@ -39,9 +39,9 @@ if (is_array($controller_data)) {
 
                 <form action="esqueci_senha.php" method="POST">
                     <div class="mb-3">
-                        <label class="form-label small fw-bold">E-mail institucional</label>
+                        <label class="form-label small fw-bold">E-mail</label>
                         <input type="email" name="email" class="form-control" required
-                            placeholder="nome@uniceplac.edu.br ou @esoftware.uniceplac.edu.br">
+                            placeholder="seu@email.com">
                     </div>
                     <button type="submit" class="btn btn-uniceplac w-100 py-2 mb-3">Enviar link de redefinição</button>
                 </form>

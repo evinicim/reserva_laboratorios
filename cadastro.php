@@ -63,10 +63,10 @@ if (is_array($controller_data)) {
                 </div>
 
                 <div class="mb-2">
-                    <label class="form-label-nitido">E-mail Institucional</label>
+                    <label class="form-label-nitido">E-mail</label>
                     <div class="input-group input-group-sm">
                         <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                        <input type="email" name="email" class="form-control" required placeholder="nome@uniceplac.edu.br ou @esoftware.uniceplac.edu.br">
+                        <input type="email" name="email" class="form-control" required placeholder="seu@email.com">
                     </div>
                 </div>
 

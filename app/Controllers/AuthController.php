@@ -104,7 +104,7 @@ class AuthController extends BaseController {
         if ($this->request->isMethod('post')) {
             $email = trim($this->request->input('email', ''));
             if (!app_email_institucional_valido($email)) {
-                $mensagem = 'Informe um e-mail institucional @uniceplac.edu.br (ou subdomínio).';
+                $mensagem = 'Informe um e-mail válido.';
                 $tipo = 'danger';
             } else {
                 $usuarioSvc = new UsuarioService();
@@ -147,7 +147,7 @@ class AuthController extends BaseController {
         $mensagem = '';
 
         if (!app_email_institucional_valido($email)) {
-            $mensagem = '<div class="alert alert-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i>Use um e-mail institucional <strong>@uniceplac.edu.br</strong> ou subdomínio (ex.: <strong>@esoftware.uniceplac.edu.br</strong>).</div>';
+            $mensagem = '<div class="alert alert-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i>Informe um <strong>e-mail válido</strong>.</div>';
         } elseif ($senha !== $senha_confirm) {
             $mensagem = '<div class="alert alert-danger"><i class="bi bi-shield-x me-2"></i>As senhas não coincidem.</div>';
         } elseif (strlen($senha) < 6) {

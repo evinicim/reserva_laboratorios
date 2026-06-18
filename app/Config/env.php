@@ -48,13 +48,10 @@ function app_env(string $key, ?string $default = null): ?string
     return $value;
 }
 
-/** E-mails @uniceplac.edu.br e subdomínios (ex.: @esoftware.uniceplac.edu.br) */
+/** Valida formato de e-mail (qualquer domínio: Gmail, Outlook, etc.) */
 function app_email_institucional_valido(string $email): bool
 {
-    return (bool) preg_match(
-        '/^[a-zA-Z0-9._%+-]+@([a-zA-Z0-9-]+\.)*uniceplac\.edu\.br$/i',
-        trim($email)
-    );
+    return filter_var(trim($email), FILTER_VALIDATE_EMAIL) !== false;
 }
 
 /** Painel sem relatórios BI pesados — acelera abertura após login */

@@ -39,7 +39,7 @@ class UsuarioService {
             throw new \InvalidArgumentException('Perfil inválido.');
         }
         if (!app_email_institucional_valido($email)) {
-            throw new \InvalidArgumentException('Use um e-mail institucional (@uniceplac.edu.br ou subdomínio, ex.: @esoftware.uniceplac.edu.br).');
+            throw new \InvalidArgumentException('Informe um e-mail válido.');
         }
 
         $dup = $this->pdo->prepare('SELECT id, nome FROM usuarios WHERE LOWER(email) = LOWER(?) LIMIT 1');
@@ -73,7 +73,7 @@ class UsuarioService {
             throw new \InvalidArgumentException('Perfil inválido.');
         }
         if (!app_email_institucional_valido($email)) {
-            throw new \InvalidArgumentException('Use um e-mail institucional (@uniceplac.edu.br ou subdomínio, ex.: @esoftware.uniceplac.edu.br).');
+            throw new \InvalidArgumentException('Informe um e-mail válido.');
         }
 
         $dup = $this->pdo->prepare('SELECT id FROM usuarios WHERE LOWER(email) = LOWER(?) AND id != ? LIMIT 1');

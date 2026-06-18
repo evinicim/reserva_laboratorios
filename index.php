@@ -143,7 +143,7 @@ if (is_array($controller_data)) {
                 <form action="index.php" method="POST">
                     <div class="mb-3">
                         <label for="email" class="form-label small fw-bold text-uniceplac">E-mail</label>
-                        <input type="email" class="form-control" name="email" id="email" required placeholder="exemplo@uniceplac.edu.br">
+                        <input type="email" class="form-control" name="email" id="email" required placeholder="seu@email.com">
                     </div>
 
                     <div class="mb-4">

@@ -234,8 +234,8 @@
                             <input type="text" name="nome_usuario" class="form-control" required placeholder="Ex: Maria Souza">
                         </div>
                         <div class="mb-3">
-                            <label class="form-label small fw-bold">E-mail institucional</label>
-                            <input type="email" name="email_usuario" class="form-control" required placeholder="nome@uniceplac.edu.br ou @esoftware.uniceplac.edu.br">
+                            <label class="form-label small fw-bold">E-mail</label>
+                            <input type="email" name="email_usuario" class="form-control" required placeholder="seu@email.com">
                         </div>
                         <div class="mb-3">
                             <label class="form-label small fw-bold">Perfil</label>
