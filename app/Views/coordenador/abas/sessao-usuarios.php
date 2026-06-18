@@ -1,7 +1,54 @@
+<style>
+    #sessao-usuarios .usuarios-card-header {
+        background: var(--bs-body-bg);
+        border-bottom: 1px solid var(--bs-border-color);
+    }
+    #sessao-usuarios .usuarios-info-bar {
+        background: rgba(0, 115, 79, 0.06);
+        border-bottom: 1px solid var(--bs-border-color);
+        color: var(--bs-secondary-color);
+    }
+    #sessao-usuarios .usuarios-title {
+        color: var(--verde-uniceplac);
+    }
+    [data-bs-theme="dark"] #sessao-usuarios .usuarios-info-bar {
+        background: rgba(0, 115, 79, 0.15);
+        color: #cbd5e1;
+    }
+    [data-bs-theme="dark"] #sessao-usuarios .usuarios-title {
+        color: #6ee7b7;
+    }
+    [data-bs-theme="dark"] #sessao-usuarios .usuarios-nome {
+        color: #f1f5f9 !important;
+    }
+    [data-bs-theme="dark"] #sessao-usuarios .table thead th {
+        background: #1e293b !important;
+        color: #e2e8f0;
+        border-color: #334155;
+    }
+    [data-bs-theme="dark"] #sessao-usuarios .btn-outline-secondary {
+        color: #94a3b8;
+        border-color: #475569;
+    }
+    [data-bs-theme="dark"] #sessao-usuarios .badge.bg-light {
+        background: #334155 !important;
+        color: #e2e8f0 !important;
+        border-color: #475569 !important;
+    }
+    #sessao-usuarios .btn-reenviar-email {
+        --bs-btn-color: var(--verde-uniceplac);
+        --bs-btn-border-color: var(--verde-uniceplac);
+    }
+    #sessao-usuarios .btn-reenviar-email:hover {
+        background: var(--verde-uniceplac);
+        color: #fff;
+    }
+</style>
+
 <div id="sessao-usuarios" class="content-section container-fluid px-4 pb-5">
     <div class="card shadow-sm border-0 mb-4" style="border-top: 4px solid var(--roxo-uniceplac);">
-        <div class="card-header bg-white py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
-            <h5 class="mb-0 fw-bold" style="color:var(--roxo-uniceplac);">
+        <div class="card-header usuarios-card-header py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <h5 class="mb-0 fw-bold usuarios-title">
                 <i class="bi bi-people-fill me-3 fs-4"></i>Usuários do Sistema
             </h5>
             <div class="d-flex align-items-center gap-2">
@@ -11,17 +58,16 @@
                 </button>
             </div>
         </div>
-        <div class="card-body border-bottom bg-light py-3">
-            <p class="text-muted small mb-0">
+        <div class="card-body usuarios-info-bar py-3">
+            <p class="small mb-0">
                 <i class="bi bi-info-circle me-1"></i>
-                Cadastre, edite dados, redefina senhas ou envie e-mail de recuperação.
-                Usuários com status <span class="badge bg-warning text-dark">Pendente</span> já estão no banco — use o botão de envelope para reenviar confirmação.
-                Professores também podem se cadastrar em <a href="cadastro.php" target="_blank" rel="noopener">Solicitar Cadastro</a> (perfil Professor).
+                Cadastre, edite dados, redefina senhas ou envie e-mail.
+                Usuários <span class="badge bg-warning text-dark">Pendente</span> — use o botão verde
+                <i class="bi bi-send-fill"></i> na linha para <strong>reenviar confirmação</strong>.
                 <?php if (empty($mail_configurado)): ?>
-                    <span class="text-warning fw-semibold">E-mail não configurado — defina RESEND_API_KEY ou BREVO_API_KEY no servidor.</span>
+                    <span class="text-warning fw-semibold d-block mt-1">E-mail não configurado — defina RESEND_API_KEY no servidor.</span>
                 <?php else: ?>
-                    <span class="text-success fw-semibold">Provedor ativo: <?= htmlspecialchars($mail_provedor ?? 'Brevo') ?>.</span>
-                    Se não chegar em 1–2 min, confira <strong>Spam/Promoções</strong> — a Brevo/Resend pode marcar como entregue mesmo indo para lixo.
+                    <span class="text-success fw-semibold d-block mt-1">Provedor: <?= htmlspecialchars($mail_provedor ?? 'Brevo') ?> — confira Spam/Promoções se não chegar em 2 min.</span>
                 <?php endif; ?>
             </p>
         </div>
@@ -41,10 +87,11 @@
                         <?php foreach ($lista_usuarios as $u):
                             $isSelf = (int) $u['id'] === (int) ($_SESSION['usuario_id'] ?? 0);
                             $temGoogle = !empty($u['google_id']);
+                            $pendente = empty($u['email_verificado']);
                             ?>
                             <tr>
                                 <td class="ps-4">
-                                    <span class="fw-bold text-dark"><?= htmlspecialchars($u['nome']) ?></span>
+                                    <span class="fw-bold usuarios-nome"><?= htmlspecialchars($u['nome']) ?></span>
                                     <?php if ($isSelf): ?>
                                         <span class="badge bg-secondary ms-1">Você</span>
                                     <?php endif; ?>
@@ -60,7 +107,7 @@
                                     <?php endif; ?>
                                 </td>
                                 <td>
-                                    <?= !empty($u['email_verificado'])
+                                    <?= !$pendente
                                         ? '<span class="badge bg-success rounded-pill"><i class="bi bi-check-circle me-1"></i>Verificado</span>'
                                         : '<span class="badge bg-warning text-dark rounded-pill"><i class="bi bi-hourglass-split me-1"></i>Pendente</span>' ?>
                                     <?php if ($temGoogle): ?>
@@ -72,6 +119,16 @@
                                 </td>
                                 <td class="pe-4 text-end">
                                     <div class="btn-group btn-group-sm">
+                                        <?php if ($pendente && !empty($mail_configurado)): ?>
+                                            <form method="POST" action="painel_coordenador.php" class="d-inline"
+                                                onsubmit="return confirm('Reenviar e-mail de confirmação para <?= htmlspecialchars(addslashes($u['email'])) ?>?');">
+                                                <input type="hidden" name="admin_enviar_verificacao" value="1">
+                                                <input type="hidden" name="id_usuario" value="<?= (int) $u['id'] ?>">
+                                                <button type="submit" class="btn btn-reenviar-email" title="Reenviar confirmação">
+                                                    <i class="bi bi-send-fill"></i>
+                                                </button>
+                                            </form>
+                                        <?php endif; ?>
                                         <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal"
                                             data-bs-target="#modalEditUser<?= (int) $u['id'] ?>" title="Editar">
                                             <i class="bi bi-pencil"></i>
@@ -139,7 +196,7 @@
                             </div>
                         </div>
                     </form>
-                    <div class="modal-footer">
+                    <div class="modal-footer flex-wrap gap-2">
                         <?php if (!$isSelf): ?>
                             <form method="POST" action="painel_coordenador.php" class="me-auto"
                                 onsubmit="return confirm('Excluir <?= htmlspecialchars(addslashes($u['nome'])) ?>? Esta ação não pode ser desfeita.');">
@@ -147,6 +204,15 @@
                                 <input type="hidden" name="id_usuario" value="<?= $uid ?>">
                                 <button type="submit" class="btn btn-outline-danger">
                                     <i class="bi bi-trash"></i> Excluir
+                                </button>
+                            </form>
+                        <?php endif; ?>
+                        <?php if (!empty($mail_configurado)): ?>
+                            <form method="POST" action="painel_coordenador.php">
+                                <input type="hidden" name="admin_enviar_verificacao" value="1">
+                                <input type="hidden" name="id_usuario" value="<?= $uid ?>">
+                                <button type="submit" class="btn btn-outline-success">
+                                    <i class="bi bi-send-fill me-1"></i> Reenviar confirmação
                                 </button>
                             </form>
                         <?php endif; ?>
@@ -182,7 +248,7 @@
                             <input type="hidden" name="admin_enviar_reset" value="1">
                             <input type="hidden" name="id_usuario" value="<?= $uid ?>">
                             <p class="small text-muted">Ou envie um link seguro para o usuário criar a própria senha (válido 24h).</p>
-                            <button type="submit" class="btn btn-outline-primary w-100" <?= empty($mail_configurado) ? 'disabled title="Configure SMTP no .env"' : '' ?>>
+                            <button type="submit" class="btn btn-outline-primary w-100" <?= empty($mail_configurado) ? 'disabled title="Configure e-mail no servidor"' : '' ?>>
                                 <i class="bi bi-envelope-arrow-up me-1"></i> Enviar link de redefinição
                             </button>
                         </form>
@@ -203,15 +269,15 @@
                         <form method="POST" action="painel_coordenador.php" class="mb-3">
                             <input type="hidden" name="admin_enviar_verificacao" value="1">
                             <input type="hidden" name="id_usuario" value="<?= $uid ?>">
-                            <p class="small text-muted">Reenvia o link para confirmar o e-mail.</p>
-                            <button type="submit" class="btn btn-outline-success w-100" <?= empty($mail_configurado) ? 'disabled' : '' ?>>
-                                <i class="bi bi-patch-check me-1"></i> Enviar confirmação de e-mail
+                            <p class="small text-muted">Reenvia o link para confirmar o e-mail (marca como Pendente até clicar).</p>
+                            <button type="submit" class="btn btn-success w-100 fw-bold" <?= empty($mail_configurado) ? 'disabled' : '' ?>>
+                                <i class="bi bi-send-fill me-1"></i> Reenviar confirmação de e-mail
                             </button>
                         </form>
                         <form method="POST" action="painel_coordenador.php">
                             <input type="hidden" name="admin_enviar_reset" value="1">
                             <input type="hidden" name="id_usuario" value="<?= $uid ?>">
-                            <p class="small text-muted">Link para o usuário redefinir a senha.</p>
+                            <p class="small text-muted">Link para o usuário redefinir ou criar a senha.</p>
                             <button type="submit" class="btn btn-outline-primary w-100" <?= empty($mail_configurado) ? 'disabled' : '' ?>>
                                 <i class="bi bi-key me-1"></i> Enviar redefinição de senha
                             </button>
@@ -229,7 +295,7 @@
                     <h6 class="modal-title fw-bold"><i class="bi bi-person-plus me-2"></i>Novo usuário</h6>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form method="POST" action="painel_coordenador.php">
+                <form method="POST" action="painel_coordenador.php" id="formNovoUsuario">
                     <input type="hidden" name="admin_criar_usuario" value="1">
                     <div class="modal-body text-start">
                         <div class="mb-3">
@@ -250,26 +316,67 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label small fw-bold">Senha inicial <span class="text-muted fw-normal">(opcional)</span></label>
-                            <input type="password" name="nova_senha" class="form-control mb-2" minlength="6" placeholder="Mínimo 6 caracteres">
+                            <input type="password" name="nova_senha" id="novoUserSenha" class="form-control mb-2" minlength="6" placeholder="Mínimo 6 caracteres">
                             <input type="password" name="confirmar_senha" class="form-control" minlength="6" placeholder="Confirmar senha">
-                            <small class="text-muted">Deixe em branco e use o botão de e-mail depois para enviar link de redefinição.</small>
                         </div>
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="checkbox" name="email_verificado" value="1" id="novoUserVerif" checked>
-                            <label class="form-check-label" for="novoUserVerif">E-mail já verificado (pode acessar imediatamente)</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="enviar_senha_email" value="1" id="novoUserSendPwd"
-                                <?= empty($mail_configurado) ? 'disabled' : '' ?>>
-                            <label class="form-check-label" for="novoUserSendPwd">Enviar senha por e-mail (se preenchida acima)</label>
+                        <div class="border rounded p-3 mb-0 bg-body-tertiary">
+                            <p class="small fw-bold mb-2"><i class="bi bi-envelope me-1"></i> E-mail ao criar</p>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" name="enviar_confirmacao_email" value="1"
+                                    id="novoUserSendConfirm" <?= !empty($mail_configurado) ? 'checked' : 'disabled' ?>>
+                                <label class="form-check-label" for="novoUserSendConfirm">
+                                    Enviar e-mail de confirmação agora
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" name="enviar_link_senha" value="1"
+                                    id="novoUserSendLink" <?= !empty($mail_configurado) ? 'checked' : 'disabled' ?>>
+                                <label class="form-check-label" for="novoUserSendLink">
+                                    Enviar link para criar senha (se senha em branco)
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" name="enviar_senha_email" value="1" id="novoUserSendPwd"
+                                    <?= empty($mail_configurado) ? 'disabled' : '' ?>>
+                                <label class="form-check-label" for="novoUserSendPwd">Enviar senha por e-mail (se preenchida acima)</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="email_verificado" value="1" id="novoUserVerif">
+                                <label class="form-check-label" for="novoUserVerif">Marcar como verificado (pula confirmação por e-mail)</label>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary fw-bold">Criar usuário</button>
+                        <button type="submit" class="btn btn-primary fw-bold">Criar e enviar e-mails</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+(function () {
+    const verif = document.getElementById('novoUserVerif');
+    const sendConfirm = document.getElementById('novoUserSendConfirm');
+    const sendLink = document.getElementById('novoUserSendLink');
+    const senha = document.getElementById('novoUserSenha');
+    if (!verif || !sendConfirm) return;
+
+    function syncNovoUsuarioChecks() {
+        if (verif.checked) {
+            sendConfirm.checked = false;
+            sendConfirm.disabled = true;
+        } else if (<?= !empty($mail_configurado) ? 'true' : 'false' ?>) {
+            sendConfirm.disabled = false;
+        }
+        if (senha && senha.value.trim() !== '') {
+            if (sendLink) sendLink.checked = false;
+        }
+    }
+    verif.addEventListener('change', syncNovoUsuarioChecks);
+    if (senha) senha.addEventListener('input', syncNovoUsuarioChecks);
+    syncNovoUsuarioChecks();
+})();
+</script>

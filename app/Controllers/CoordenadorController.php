@@ -137,6 +137,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new \InvalidArgumentException('As senhas não coincidem.');
             }
             $emailVerificado = isset($_POST['email_verificado']) ? 1 : 0;
+            $enviarConfirmacao = isset($_POST['enviar_confirmacao_email']);
+            $enviarLinkSenha = isset($_POST['enviar_link_senha']);
             $id = $usuarioSvc->criar(
                 trim($_POST['nome_usuario'] ?? ''),
                 trim($_POST['email_usuario'] ?? ''),
@@ -150,21 +152,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             $avisosEmail = [];
-            if (!$emailVerificado && $mailSvc->isConfigured()) {
+            $deveEnviarConfirmacao = $enviarConfirmacao || (!$emailVerificado && $mailSvc->isConfigured());
+            if ($deveEnviarConfirmacao && $mailSvc->isConfigured()) {
                 $token = $usuarioSvc->gerarTokenVerificacao($id);
                 if ($mailSvc->enviarVerificacaoEmail($user['email'], $user['nome'], $token)) {
-                    $avisosEmail[] = 'E-mail de confirmação enviado para ' . $user['email'] . '.';
+                    $avisosEmail[] = 'E-mail de confirmação enviado para <strong>' . htmlspecialchars($user['email']) . '</strong>.';
                 } else {
-                    $avisosEmail[] = 'Usuário salvo como <strong>Pendente</strong>, mas o e-mail não foi enviado (verifique Brevo). Use o botão <i class="bi bi-envelope"></i> na lista para reenviar.';
+                    $detail = $mailSvc->lastError() ?: 'erro desconhecido';
+                    $avisosEmail[] = 'Usuário criado, mas o e-mail <strong>não</strong> foi enviado: ' . htmlspecialchars($detail) . '. Use «Reenviar» na lista.';
                 }
-            } elseif ($senha !== '' && isset($_POST['enviar_senha_email']) && $mailSvc->isConfigured()) {
+            } elseif ($deveEnviarConfirmacao && !$mailSvc->isConfigured()) {
+                $avisosEmail[] = 'Usuário criado como <strong>Pendente</strong>. Configure RESEND_API_KEY ou BREVO para enviar confirmação.';
+            }
+
+            if ($senha !== '' && isset($_POST['enviar_senha_email']) && $mailSvc->isConfigured()) {
                 if ($mailSvc->enviarSenhaTemporaria($user['email'], $user['nome'], $senha)) {
                     $avisosEmail[] = 'Senha enviada por e-mail.';
                 } else {
-                    $avisosEmail[] = 'Usuário criado, mas a senha <strong>não</strong> foi enviada por e-mail (verifique Brevo).';
+                    $avisosEmail[] = 'Senha <strong>não</strong> enviada por e-mail.';
                 }
-            } elseif (!$emailVerificado && !$mailSvc->isConfigured()) {
-                $avisosEmail[] = 'Usuário criado como <strong>Pendente</strong>. Marque «E-mail verificado» ou configure MAIL_* para enviar confirmação.';
+            } elseif ($senha === '' && $enviarLinkSenha && $mailSvc->isConfigured()) {
+                $token = $usuarioSvc->gerarTokenRedefinicao($id);
+                if ($mailSvc->enviarRedefinicaoSenha($user['email'], $user['nome'], $token)) {
+                    $avisosEmail[] = 'Link para criar senha enviado por e-mail.';
+                } else {
+                    $detail = $mailSvc->lastError() ?: 'erro desconhecido';
+                    $avisosEmail[] = 'Link de senha <strong>não</strong> enviado: ' . htmlspecialchars($detail) . '.';
+                }
             }
 
             $classe = str_contains(implode(' ', $avisosEmail), 'não') ? 'alert-warning' : 'alert-success';
