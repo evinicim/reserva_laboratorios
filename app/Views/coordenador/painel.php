@@ -10,6 +10,7 @@
     <title>Painel da Coordenação - UNICEPLAC</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="css/labhub-theme.css">
     <link rel="stylesheet" href="css/notificacoes-nav.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
@@ -23,13 +24,9 @@
 
     <style>
         :root {
-            --verde-uniceplac: #00734F;
-            --roxo-uniceplac: #421B71;
-            --laranja-uniceplac: #F0733C;
-            --azul-google: #4285F4;
-            --manha-cor: var(--verde-uniceplac);
-            --tarde-cor: var(--laranja-uniceplac);
-            --noite-cor: var(--roxo-uniceplac);
+            --manha-cor: var(--lh-verde);
+            --tarde-cor: var(--lh-laranja);
+            --noite-cor: var(--lh-roxo-text);
         }
 
         body {

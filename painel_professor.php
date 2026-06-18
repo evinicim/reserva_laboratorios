@@ -426,6 +426,7 @@ function renderizarCardEnsalamento($e, $badge_cor, $borda_classe) {
     <title>Portal Docente - UNICEPLAC</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="css/labhub-theme.css">
     <link rel="stylesheet" href="css/notificacoes-nav.css">
     <link rel="stylesheet" href="css/labhub-alerts.css">
     
@@ -637,15 +638,15 @@ function renderizarCardEnsalamento($e, $badge_cor, $borda_classe) {
 
         <div id="sessao-calendario" class="content-section">
             <div class="card shadow-sm border-0 mb-4" style="border-top: 4px solid var(--azul-google);">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0 fw-bold text-dark d-flex align-items-center"><i class="bi bi-calendar3 text-primary me-3 fs-4"></i> Meu Calendário Pessoal</h5>
-                    <p class="text-muted small mb-0 mt-1">
-                        <span class="badge me-2" style="background-color: rgba(66, 27, 113, 0.15); color: var(--roxo-uniceplac); border: 1px solid var(--roxo-uniceplac);">Aulas Fixas da Grade</span> 
-                        <span class="badge me-2" style="background-color: rgba(240, 115, 60, 0.15); color: #c95b28; border: 1px solid var(--laranja-uniceplac);">Reservas Avulsas Aprovadas</span>
-                        <span class="badge" style="background-color: rgba(220, 53, 69, 0.15); color: #dc3545; border: 1px solid #dc3545;">Feriados Nacionais</span>
+                <div class="card-header lh-card-header py-3">
+                    <h5 class="mb-0 fw-bold lh-title-verde d-flex align-items-center"><i class="bi bi-calendar3 me-3 fs-4"></i> Meu Calendário Pessoal</h5>
+                    <p class="text-muted small mb-0 mt-2 lh-legenda-calendario">
+                        <span class="lh-badge lh-badge-fixa me-2">Aulas Fixas da Grade</span>
+                        <span class="lh-badge lh-badge-avulsa me-2">Reservas Avulsas Aprovadas</span>
+                        <span class="lh-badge lh-badge-feriado">Feriados Nacionais</span>
                     </p>
                 </div>
-                <div class="card-body bg-white p-3 p-md-4">
+                <div class="card-body lh-card-body p-3 p-md-4">
                     <?php if (!$id_quadro_ativo && count($eventos_calendario) === 0): ?>
                         <div class="alert alert-info border-0 border-start border-4 border-info rounded-0 mb-3">
                             <i class="bi bi-info-circle-fill me-2"></i>
@@ -658,12 +659,12 @@ function renderizarCardEnsalamento($e, $badge_cor, $borda_classe) {
                             <strong>Grade fixa não disponível:</strong> A coordenação ainda não criou um Quadro de Horários. Exibindo apenas suas reservas avulsas.
                         </div>
                     <?php endif; ?>
-                    <p class="text-muted small mb-3">
-                        <span class="badge me-2" style="background-color:rgba(66,27,113,0.15);color:var(--roxo-uniceplac);border:1px solid var(--roxo-uniceplac);">Aulas Fixas da Grade</span>
-                        <span class="badge me-2" style="background-color:rgba(240,115,60,0.15);color:#c95b28;border:1px solid var(--laranja-uniceplac);">Reservas Aprovadas</span>
-                        <span class="badge me-2" style="background-color:rgba(255,193,7,0.15);color:#856404;border:1px solid #e0a800;">⏳ Aguardando Aprovação</span>
-                        <span class="badge me-2" style="background-color:rgba(108,117,125,0.12);color:#6c757d;border:1px solid #adb5bd;">✗ Rejeitadas</span>
-                        <span class="badge" style="background-color:rgba(220,53,69,0.15);color:#dc3545;border:1px solid #dc3545;">Feriados Nacionais</span>
+                    <p class="text-muted small mb-3 lh-legenda-calendario">
+                        <span class="lh-badge lh-badge-fixa me-2">Aulas Fixas da Grade</span>
+                        <span class="lh-badge lh-badge-avulsa me-2">Reservas Aprovadas</span>
+                        <span class="lh-badge lh-badge-pendente me-2">⏳ Aguardando Aprovação</span>
+                        <span class="lh-badge lh-badge-rejeitada me-2">✗ Rejeitadas</span>
+                        <span class="lh-badge lh-badge-feriado">Feriados Nacionais</span>
                     </p>
                     <div id="calendarioProfessor"></div>
                 </div>

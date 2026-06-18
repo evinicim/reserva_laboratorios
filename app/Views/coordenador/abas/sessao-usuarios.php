@@ -3,66 +3,34 @@
         background: var(--bs-body-bg);
         border-bottom: 1px solid var(--bs-border-color);
     }
-    #sessao-usuarios .usuarios-info-bar {
-        background: rgba(0, 115, 79, 0.06);
-        border-bottom: 1px solid var(--bs-border-color);
-        color: var(--bs-secondary-color);
-    }
-    #sessao-usuarios .usuarios-title {
-        color: var(--verde-uniceplac);
-    }
-    [data-bs-theme="dark"] #sessao-usuarios .usuarios-info-bar {
-        background: rgba(0, 115, 79, 0.15);
-        color: #cbd5e1;
-    }
-    [data-bs-theme="dark"] #sessao-usuarios .usuarios-title {
-        color: #6ee7b7;
-    }
-    [data-bs-theme="dark"] #sessao-usuarios .usuarios-nome {
-        color: #f1f5f9 !important;
-    }
-    [data-bs-theme="dark"] #sessao-usuarios .table thead th {
-        background: #1e293b !important;
-        color: #e2e8f0;
-        border-color: #334155;
-    }
-    [data-bs-theme="dark"] #sessao-usuarios .btn-outline-secondary {
-        color: #94a3b8;
-        border-color: #475569;
-    }
-    [data-bs-theme="dark"] #sessao-usuarios .badge.bg-light {
-        background: #334155 !important;
-        color: #e2e8f0 !important;
-        border-color: #475569 !important;
-    }
     #sessao-usuarios .btn-reenviar-email {
-        --bs-btn-color: var(--verde-uniceplac);
-        --bs-btn-border-color: var(--verde-uniceplac);
+        --bs-btn-color: var(--lh-verde-text);
+        --bs-btn-border-color: var(--lh-verde);
     }
     #sessao-usuarios .btn-reenviar-email:hover {
-        background: var(--verde-uniceplac);
+        background: var(--lh-verde);
         color: #fff;
     }
 </style>
 
 <div id="sessao-usuarios" class="content-section container-fluid px-4 pb-5">
-    <div class="card shadow-sm border-0 mb-4" style="border-top: 4px solid var(--roxo-uniceplac);">
+    <div class="card shadow-sm border-0 mb-4" style="border-top: 4px solid var(--lh-verde);">
         <div class="card-header usuarios-card-header py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
-            <h5 class="mb-0 fw-bold usuarios-title">
+            <h5 class="mb-0 fw-bold lh-title-roxo">
                 <i class="bi bi-people-fill me-3 fs-4"></i>Usuários do Sistema
             </h5>
             <div class="d-flex align-items-center gap-2">
-                <span class="badge" style="background:var(--roxo-uniceplac);"><?= count($lista_usuarios) ?> cadastrados</span>
+                <span class="lh-badge lh-badge-contagem"><?= count($lista_usuarios) ?> cadastrados</span>
                 <button type="button" class="btn btn-sm btn-uniceplac fw-bold" data-bs-toggle="modal" data-bs-target="#modalNovoUsuario">
                     <i class="bi bi-person-plus me-1"></i> Novo usuário
                 </button>
             </div>
         </div>
-        <div class="card-body usuarios-info-bar py-3">
+        <div class="card-body lh-info-bar py-3 border-bottom">
             <p class="small mb-0">
                 <i class="bi bi-info-circle me-1"></i>
                 Cadastre, edite dados, redefina senhas ou envie e-mail.
-                Usuários <span class="badge bg-warning text-dark">Pendente</span> — use o botão verde
+                Usuários <span class="lh-badge lh-badge-pendente">Pendente</span> — use o botão verde
                 <i class="bi bi-send-fill"></i> na linha para <strong>reenviar confirmação</strong>.
                 <?php if (empty($mail_configurado)): ?>
                     <span class="text-warning fw-semibold d-block mt-1">E-mail não configurado — defina RESEND_API_KEY no servidor.</span>
@@ -91,7 +59,7 @@
                             ?>
                             <tr>
                                 <td class="ps-4">
-                                    <span class="fw-bold usuarios-nome"><?= htmlspecialchars($u['nome']) ?></span>
+                                    <span class="fw-bold"><?= htmlspecialchars($u['nome']) ?></span>
                                     <?php if ($isSelf): ?>
                                         <span class="badge bg-secondary ms-1">Você</span>
                                     <?php endif; ?>
@@ -99,17 +67,17 @@
                                 <td class="text-muted small"><?= htmlspecialchars($u['email']) ?></td>
                                 <td>
                                     <?php if ($u['perfil'] === 'coordenador'): ?>
-                                        <span class="badge" style="background:var(--verde-uniceplac);">Coordenador</span>
+                                        <span class="lh-badge lh-badge-coordenador">Coordenador</span>
                                     <?php elseif ($u['perfil'] === 'professor'): ?>
-                                        <span class="badge" style="background:var(--roxo-uniceplac);">Professor</span>
+                                        <span class="lh-badge lh-badge-professor">Professor</span>
                                     <?php else: ?>
                                         <span class="badge bg-info text-dark">Suporte TI</span>
                                     <?php endif; ?>
                                 </td>
                                 <td>
                                     <?= !$pendente
-                                        ? '<span class="badge bg-success rounded-pill"><i class="bi bi-check-circle me-1"></i>Verificado</span>'
-                                        : '<span class="badge bg-warning text-dark rounded-pill"><i class="bi bi-hourglass-split me-1"></i>Pendente</span>' ?>
+                                        ? '<span class="lh-badge lh-badge-verificado rounded-pill"><i class="bi bi-check-circle me-1"></i>Verificado</span>'
+                                        : '<span class="lh-badge lh-badge-pendente rounded-pill"><i class="bi bi-hourglass-split me-1"></i>Pendente</span>' ?>
                                     <?php if ($temGoogle): ?>
                                         <span class="badge bg-light text-dark border ms-1" title="Login Google"><i class="bi bi-google"></i></span>
                                     <?php endif; ?>
