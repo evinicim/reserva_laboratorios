@@ -235,7 +235,7 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label small fw-bold">E-mail institucional</label>
-                            <input type="email" name="email_usuario" class="form-control" required placeholder="nome@uniceplac.edu.br">
+                            <input type="email" name="email_usuario" class="form-control" required placeholder="nome@uniceplac.edu.br ou @esoftware.uniceplac.edu.br">
                         </div>
                         <div class="mb-3">
                             <label class="form-label small fw-bold">Perfil</label>

@@ -114,8 +114,8 @@ class AuthController extends BaseController {
         
         $mensagem = '';
 
-        if (!preg_match('/@uniceplac\.edu\.br$/', $email)) {
-            $mensagem = '<div class="alert alert-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i>Apenas e-mails <strong>@uniceplac.edu.br</strong>.</div>';
+        if (!app_email_institucional_valido($email)) {
+            $mensagem = '<div class="alert alert-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i>Use um e-mail institucional <strong>@uniceplac.edu.br</strong> ou subdomínio (ex.: <strong>@esoftware.uniceplac.edu.br</strong>).</div>';
         } elseif ($senha !== $senha_confirm) {
             $mensagem = '<div class="alert alert-danger"><i class="bi bi-shield-x me-2"></i>As senhas não coincidem.</div>';
         } elseif (strlen($senha) < 6) {

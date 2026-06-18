@@ -38,8 +38,8 @@ class UsuarioService {
         if (!in_array($perfil, ['coordenador', 'professor', 'suporte'], true)) {
             throw new \InvalidArgumentException('Perfil inválido.');
         }
-        if (!preg_match('/@uniceplac\.edu\.br$/i', $email)) {
-            throw new \InvalidArgumentException('Use um e-mail @uniceplac.edu.br.');
+        if (!app_email_institucional_valido($email)) {
+            throw new \InvalidArgumentException('Use um e-mail institucional (@uniceplac.edu.br ou subdomínio, ex.: @esoftware.uniceplac.edu.br).');
         }
 
         $dup = $this->pdo->prepare('SELECT id, nome FROM usuarios WHERE LOWER(email) = LOWER(?) LIMIT 1');
@@ -67,8 +67,8 @@ class UsuarioService {
         if (!in_array($perfil, ['coordenador', 'professor', 'suporte'], true)) {
             throw new \InvalidArgumentException('Perfil inválido.');
         }
-        if (!preg_match('/@uniceplac\.edu\.br$/i', $email)) {
-            throw new \InvalidArgumentException('Use um e-mail @uniceplac.edu.br.');
+        if (!app_email_institucional_valido($email)) {
+            throw new \InvalidArgumentException('Use um e-mail institucional (@uniceplac.edu.br ou subdomínio, ex.: @esoftware.uniceplac.edu.br).');
         }
 
         $dup = $this->pdo->prepare('SELECT id FROM usuarios WHERE LOWER(email) = LOWER(?) AND id != ? LIMIT 1');
